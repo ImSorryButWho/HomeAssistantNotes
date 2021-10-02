@@ -83,3 +83,42 @@ To use this, you'll want to create some Home Assistant automations like:
 
 ## Indicators (lights and sounds)
 
+The lights and sounds on the keypad are controlled with the Z-Wave Indicator Command class.  Unfortunately, Home Assistant does not have a nice API for this command class.  Fortunately, it does provide the `zwave_js.set_value` action for performing arbitrary Z-Wave commands, which we can use for this purpose.
+
+For example, to set the keypad to disarmed mode, we can run the following command:
+
+    service: zwave_js.set_value
+    target:
+       entity_id: sensor.ring_keypad_v2_battery_level
+    data:
+      command_class: '135'
+      endpoint: '0'
+      property: '2'
+      property_key: '1'
+      value: 1
+      
+You can use any `entity_id` associated with the keypad, or find the device id and use that.  `command_class` will always be 135 (the indicator command class), and `endpoint` will always be 0.  For most messages, I find it makes sense to use a `property_key` of 1 and `value` of 1, just indicating that the indicator should be turned on (meaning that we're playing a message or changing the mode of the keypad).  For indicators where a time make sense (e.g. entry delay, exit delay or alarms), use `property_key` 7 and a value of the number of seconds you want it to last.
+
+The following tables summarize the indicators by `property`s that actually do anything that I can find.
+
+### Modes, alarms and messages (use `property_key` 1)
+
+| `property` | Description |
+| ---------- | ----------- |
+| 2 | Disarmed.  Keypad says "Disarmed," disarmed light lights up on motion. |
+| 9 | Code not accepted.  A soft error tone plays. |
+| 10 | Armed Stay.  Keypad says "Home and armed," armed stay light lights up on motion. |
+| 11 | Armed Away.  Keypad says "Away and armed," armed away light lights up on motion. |
+| 12 | Generic alarm.  Plays alarm, flashes light until another mode is selected.  Does not respect duration (property_key 7). |
+| 13 | Burglar alarm.  Identical to 12. |
+| 14 | Smoke alarm.  Plays smoke alarm, flashes light until another mode is selected.  Does not respect duration (property_key 7). |
+| 15 | Carbon monoxide alarm.  Plays intermittent beeping alarm, flashes light until another mode is selected.  Does not respect duration (property_key 7). |
+| 16 | Keypad says "Sensors require bypass."  Enter button blinks. |
+| 19 | Medical alarm.  Medical button lights, bar flashes.  No alarm sound plays.  Does not respect duration (property_key 7). |
+
+### Delays (use `property_key` 7 to specify length in seconds)
+
+| `property` | Description |
+| ---------- | ----------- |
+| 17 | Entry delay.  Keypad says "Entry delay started." Plays sound, speeding up near end of specified duration.  Bar shows countdown. |
+| 18 | Exit delay.  Keypad says "Exit delay started." Plays sound, speeding up near end of specified duration.  Bar shows countup. |
