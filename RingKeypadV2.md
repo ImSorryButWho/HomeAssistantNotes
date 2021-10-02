@@ -8,7 +8,21 @@ In this document, I'll talk about how to use the Ring keypad with Home Assistant
 
 ## Pairing
 
+As of this writing, ZWaveJS2MQTT is the only method I can find to successfully pair the keypad with Home Assistant with full functionality.  I assume the standard ZWaveJS implementation will gain support for S2 security eventually, but currently (October 2021) the UI doesn't support it.
+
+So, to make this work, be sure you're using ZWaveJS2MQTT.  The easiest way to do that is via the [community add-on](https://github.com/hassio-addons/addon-zwavejs2mqtt), which is part of the default add-on store.  Migrating from the standard ZWaveJS add-on to ZWaveJS2MQTT is out of the scope of this document, but should be straightforward.
+
+If you haven't set up any devices with S2 security before, you likely don't have S2 keys defined.  In the ZWaveJS2MQTT settings page ZWave area, click the two arrows button next to the three S2 keys to generate new ones.  (Of course, don't do this if you already have keys defined, or you'll lose the ability to control whatever devices you already have paired!)
+
+There's one issue I've had with this keypad: the security negotiation seems to time out quickly.  I found I need to have the DSK PIN (from the QR code on the back of the keypad) entered within a couple of seconds, or security negotiation fails.  I'd strongly suggest you type the PIN into a text document and copy it to your clipboard, ready to paste in as soon as ZWaveJS2MQTT asks for it.
+
+Now you're ready to pair.  Plug the keypad into a power outlet (it will not pair on batteries).  Start inclusion by clicking "Manage Nodes" on the main ZWaveJS2MQTT page, then selecting Default mode.  Once inclusion mode starts, hold down the 1 key on the keypad until the green indicator starts flashing.
+
+Eventually, a security choice pop-up will appear.  Click next quickly, and the DSK prompt will appear.  Paste in the PIN you copied earlier and click next quickly.  In a few seconds, you should see confirmation that it was paired with S2 Access Control.  If not, you'll need to try again.
+
+If it failed, go to Manage Nodes -> Exclusion, and while you're in exclusion mode insert the reset pin that was included in the box in the hole on the back of the keypad.  Try the inclusion process again.
+
 ## Entry Control (receiving button events)
 
-## Notifications (lights and sounds)
+## Indicators (lights and sounds)
 
