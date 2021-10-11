@@ -1,0 +1,63 @@
+- id: "disarm_alarm_from_keypad"
+  alias: "Disarm alarm from keypad"
+  trigger:
+    platform: event
+    event_type: "zwave_js_notification"
+    event_data:
+      command_class: 111
+      node_id: 162
+      event_type: 2
+  action:
+    - service: alarm_control_panel.alarm_disarm
+      entity_id: alarm_control_panel.alarm
+      data:
+        code: "{{ trigger.event.data.event_data }}"
+- id: "arm_home_from_keypad"
+  alias: "Arm alarm home from keypad"
+  trigger:
+    platform: event
+    event_type: "zwave_js_notification"
+    event_data:
+      command_class: 111
+      node_id: 162
+      event_type: 6
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.alarm
+      state: "disarmed"
+  action:
+    - service: alarm_control_panel.alarm_arm_home
+      entity_id: alarm_control_panel.alarm
+- id: "arm_away_from_keypad"
+  alias: "Arm alarm away from keypad"
+  trigger:
+    platform: event
+    event_type: "zwave_js_notification"
+    event_data:
+      command_class: 111
+      node_id: 162
+      event_type: 5
+  condition:
+    - condition: state
+      entity_id: alarm_control_panel.alarm
+      state: "disarmed"
+  action:
+    - service: alarm_control_panel.alarm_arm_away
+      entity_id: alarm_control_panel.alarm
+- id: "alert_for_invalid_code"
+  alias: "Alert for invalid code on keypad"
+  trigger:
+    platform: event
+    event_type: "alarmo_failed_to_arm"
+    event_data:
+      reason: "invalid_code"
+  action:
+    - service: zwave_js.set_value
+      target:
+        entity_id: sensor.ring_keypad_v2_battery_level
+      data:
+        command_class: "135"
+        endpoint: "0"
+        property: "9"
+        property_key: "1"
+        value: 1
