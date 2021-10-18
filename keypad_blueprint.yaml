@@ -175,7 +175,7 @@ action:
             value: 1
     - conditions:
         - condition: trigger
-          id: alarm_armed_stay
+          id: alarm_armed_home
       sequence:
         - service: zwave_js.set_value
           target: !input keypad
