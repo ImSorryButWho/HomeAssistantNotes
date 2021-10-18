@@ -1,6 +1,6 @@
 blueprint:
   name: Ring Keypad Automations
-  description: Automations to use the Ring Keypad with an Alarm Panel integration.  See https://github.com/ImSorryButWho/HomeAssistantNotes/blob/main/RingKeypadV2.md for more information.
+  description: "Automations to use the Ring Keypad with an Alarm Panel integration.  See https://github.com/ImSorryButWho/HomeAssistantNotes/blob/main/RingKeypadV2.md for more information."
   domain: automation
   input:
     keypad:
@@ -8,7 +8,7 @@ blueprint:
       description: The device entry for the Ring keypad
       selector:
         target:
-          integration: zwavejs
+          integration: zwave_js
     keypad_node_id:
       name: Keypad Z-Wave Node ID
       description: The Z-Wave Node ID for the Ring Keypad
