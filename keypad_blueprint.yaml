@@ -22,9 +22,8 @@ blueprint:
       name: Alarm Control Panel entity
       description: The Alarm Control Panel to synchronize the keypad with
       selector:
-        target:
-          entity:
-            domain: alarm_control_panel
+        entity:
+          domain: alarm_control_panel
     entry_delay:
       name: Entry Delay
       description: Entry delay before alarm sounds (in seconds).  Should be set to the same value as the alarm is configured for.
