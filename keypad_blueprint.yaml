@@ -101,27 +101,31 @@ trigger:
     id: alarm_triggered
 action:
   choose:
-    - conditions: trigger
-      id:
-        - code_entered
-        - keypad_disarm
+    - conditions:
+        - condition: trigger
+          id:
+            - code_entered
+            - keypad_disarm
       sequence:
         - service: alarm_control_panel.alarm_disarm
           target: !input alarm
           data:
             code: "{{ trigger.event.data.event_data }}"
-    - conditions: trigger
-      id: keypad_arm_away
+    - conditions:
+        - condition: trigger
+          id: keypad_arm_away
       sequence:
         - service: alarm_control_panel.alarm_arm_away
           target: !input alarm
-    - conditions: trigger
-      id: keypad_arm_home
+    - conditions:
+        - condition: trigger
+          id: keypad_arm_home
       sequence:
         - service: alarm_control_panel.alarm_arm_home
           target: !input alarm
-    - conditions: trigger
-      id: invalid_code
+    - conditions:
+        - condition: trigger
+          id: invalid_code
       sequence:
         - service: zwave_js.set_value
           target: !input keypad
@@ -131,8 +135,9 @@ action:
             property: "9"
             property_key: "1"
             value: 1
-    - conditions: trigger
-      id: alarm_disarmed
+    - conditions:
+        - condition: trigger
+          id: alarm_disarmed
       sequence:
         - service: zwave_js.set_value
           target: !input keypad
@@ -142,8 +147,9 @@ action:
             property: "2"
             property_key: "1"
             value: 1
-    - conditions: trigger
-      id: alarm_armed_away
+    - conditions:
+        - condition: trigger
+          id: alarm_armed_away
       sequence:
         - service: zwave_js.set_value
           target: !input keypad
@@ -153,8 +159,9 @@ action:
             property: "11"
             property_key: "1"
             value: 1
-    - conditions: trigger
-      id: alarm_armed_stay
+    - conditions:
+        - condition: trigger
+          id: alarm_armed_stay
       sequence:
         - service: zwave_js.set_value
           target: !input keypad
@@ -164,8 +171,9 @@ action:
             property: "10"
             property_key: "1"
             value: 1
-    - conditions: trigger
-      id: alarm_arming
+    - conditions:
+        - condition: trigger
+          id: alarm_arming
       sequence:
         - service: zwave_js.set_value
           target: !input keypad
@@ -175,8 +183,9 @@ action:
             property: "18"
             property_key: "7"
             value: !input exit_delay
-    - conditions: trigger
-      id: alarm_pending
+    - conditions:
+        - condition: trigger
+          id: alarm_pending
       sequence:
         - service: zwave_js.set_value
           target: !input keypad
@@ -186,8 +195,9 @@ action:
             property: "17"
             property_key: "7"
             value: !input entry_delay
-    - conditions: trigger
-      id: alarm_triggered
+    - conditions:
+        - condition: trigger
+          id: alarm_triggered
       sequence:
         - service: zwave_js.set_value
           target: !input keypad
