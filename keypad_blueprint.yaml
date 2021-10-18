@@ -76,27 +76,27 @@ trigger:
       reason: "invalid_code"
     id: invalid_code
   - platform: state
-    entity_id: !input alarm_control_panel
+    entity_id: !input alarm
     to: disarmed
     id: alarm_disarmed
   - platform: state
-    entity_id: !input alarm_control_panel
+    entity_id: !input alarm
     to: arming
     id: alarm_arming
   - platform: state
-    entity_id: !input alarm_control_panel
+    entity_id: !input alarm
     to: armed_away
     id: alarm_armed_away
   - platform: state
-    entity_id: !input alarm_control_panel
+    entity_id: !input alarm
     to: armed_home
     id: alarm_armed_home
   - platform: state
-    entity_id: !input alarm_control_panel
+    entity_id: !input alarm
     to: pending
     id: alarm_pending
   - platform: state
-    entity_id: !input alarm_control_panel
+    entity_id: !input alarm
     to: triggered
     id: alarm_triggered
 action:
