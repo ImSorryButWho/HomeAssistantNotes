@@ -40,6 +40,8 @@ blueprint:
           min: 0
           max: 240
           unit_of_measurement: seconds
+mode: parallel
+max: 10
 trigger:
   - platform: event
     event_type: "zwave_js_notification"
@@ -112,15 +114,25 @@ action:
           data:
             code: "{{ trigger.event.data.event_data }}"
     - conditions:
-        - condition: trigger
-          id: keypad_arm_away
+        - condition: and
+          conditions:
+            - condition: trigger
+              id: keypad_arm_away
+            - condition: state
+              entity_id: !input alarm
+              state: "disarmed"
       sequence:
         - service: alarm_control_panel.alarm_arm_away
           target:
             entity_id: !input alarm
     - conditions:
-        - condition: trigger
-          id: keypad_arm_home
+        - condition: and
+          conditions:
+            - condition: trigger
+              id: keypad_arm_home
+            - condition: state
+              entity_id: !input alarm
+              state: disarmed
       sequence:
         - service: alarm_control_panel.alarm_arm_home
           target:
