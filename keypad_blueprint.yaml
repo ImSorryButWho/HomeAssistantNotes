@@ -8,7 +8,8 @@ blueprint:
       description: The device entry for the Ring keypad
       selector:
         target:
-          integration: zwavejs
+          device:
+            integration: zwave_js
     keypad_node_id:
       name: Keypad Z-Wave Node ID
       description: The Z-Wave Node ID for the Ring Keypad
@@ -31,7 +32,7 @@ blueprint:
         number:
           min: 0
           max: 240
-          default: 60
+          unit_of_measurement: seconds
     exit_delay:
       name: Exit Delay
       description: Exit delay before alarm is armed (in seconds).  Should be set to the same value as the alarm is configured for.
@@ -39,7 +40,7 @@ blueprint:
         number:
           min: 0
           max: 240
-          default: 60
+          unit_of_measurement: seconds
 trigger:
   - platform: event
     event_type: "zwave_js_notification"
