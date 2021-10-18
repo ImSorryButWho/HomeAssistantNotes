@@ -122,3 +122,11 @@ The following tables summarize the indicators by `property`s that actually do an
 | ---------- | ----------- |
 | 17 | Entry delay.  Keypad says "Entry delay started." Plays sound, speeding up near end of specified duration.  Bar shows countdown. |
 | 18 | Exit delay.  Keypad says "Exit delay started." Plays sound, speeding up near end of specified duration.  Bar shows countup. |
+
+## Automation Blueprint
+
+[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FImSorryButWho%2FHomeAssistantNotes%2Fblob%2Fmain%2Fkeypad_blueprint.yaml)
+
+I've created a [blueprint](https://github.com/ImSorryButWho/HomeAssistantNotes/blob/main/keypad_blueprint.yaml) that will create an automation which handles all the basic interactions between an `alarm_control_panel` instance and the Ring Keypad v2.  Pair the keypad following the instructions above, and configure an Alarmo instance in your Home Assistant.  Then, you can install the Blueprint above and create the automation, giving it the device for the keypad, the entity_id for the alarm instance, as well as the Z-Wave Node ID for the keypad (necessary to identify the events of interest), and the entry and exit delay times for the alarm.
+
+Please feel free to send pull requests for improvements.  This is my first Blueprint.
