@@ -109,8 +109,7 @@ action:
             - keypad_disarm
       sequence:
         - service: alarm_control_panel.alarm_disarm
-          target:
-            entity_id: !input alarm
+          entity_id: !input alarm
           data:
             code: "{{ trigger.event.data.event_data }}"
     - conditions:
@@ -123,8 +122,7 @@ action:
               state: "disarmed"
       sequence:
         - service: alarm_control_panel.alarm_arm_away
-          target:
-            entity_id: !input alarm
+          entity_id: !input alarm
     - conditions:
         - condition: and
           conditions:
@@ -135,8 +133,7 @@ action:
               state: disarmed
       sequence:
         - service: alarm_control_panel.alarm_arm_home
-          target:
-            entity_id: !input alarm
+          entity_id: !input alarm
     - conditions:
         - condition: trigger
           id: invalid_code
