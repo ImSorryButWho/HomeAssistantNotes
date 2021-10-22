@@ -1,0 +1,206 @@
+blueprint:
+  name: Ring Keypad Automations - Beta
+  description: Automations to use the Ring Keypad with an Alarm Panel integration.  See https://github.com/ImSorryButWho/HomeAssistantNotes/blob/main/RingKeypadV2.md for more information.
+  domain: automation
+  input:
+    keypad:
+      name: Keypad Device
+      description: The device entry for the Ring keypad
+      selector:
+        target:
+          device:
+            integration: zwave_js
+    keypad_node_id:
+      name: Keypad Z-Wave Node ID
+      description: The Z-Wave Node ID for the Ring Keypad
+      selector:
+        number:
+          min: 1
+          max: 254
+          mode: box
+    alarm:
+      name: Alarm Control Panel entity
+      description: The Alarm Control Panel to synchronize the keypad with
+      selector:
+        entity:
+          domain: alarm_control_panel
+variables:
+  alarm: !input alarm
+mode: parallel
+max: 10
+trigger:
+  - platform: event
+    event_type: "zwave_js_notification"
+    event_data:
+      command_class: 111
+      node_id: !input keypad_node_id
+      event_type: 2
+    id: code_entered
+  - platform: event
+    event_type: "zwave_js_notification"
+    event_data:
+      command_class: 111
+      node_id: !input keypad_node_id
+      event_type: 3
+    id: keypad_disarm
+  - platform: event
+    event_type: "zwave_js_notification"
+    event_data:
+      command_class: 111
+      node_id: !input keypad_node_id
+      event_type: 5
+    id: keypad_arm_away
+  - platform: event
+    event_type: "zwave_js_notification"
+    event_data:
+      command_class: 111
+      node_id: !input keypad_node_id
+      event_type: 6
+    id: keypad_arm_home
+  - platform: event
+    event_type: "alarmo_failed_to_arm"
+    event_data:
+      reason: "invalid_code"
+    id: invalid_code
+  - platform: state
+    entity_id: !input alarm
+    to: disarmed
+    id: alarm_disarmed
+  - platform: state
+    entity_id: !input alarm
+    to: arming
+    id: alarm_arming
+  - platform: state
+    entity_id: !input alarm
+    to: armed_away
+    id: alarm_armed_away
+  - platform: state
+    entity_id: !input alarm
+    to: armed_home
+    id: alarm_armed_home
+  - platform: state
+    entity_id: !input alarm
+    to: pending
+    id: alarm_pending
+  - platform: state
+    entity_id: !input alarm
+    to: triggered
+    id: alarm_triggered
+action:
+  choose:
+    - conditions:
+        - condition: trigger
+          id:
+            - code_entered
+            - keypad_disarm
+      sequence:
+        - service: alarm_control_panel.alarm_disarm
+          entity_id: !input alarm
+          data:
+            code: "{{ trigger.event.data.event_data }}"
+    - conditions:
+        - condition: and
+          conditions:
+            - condition: trigger
+              id: keypad_arm_away
+            - condition: state
+              entity_id: !input alarm
+              state: "disarmed"
+      sequence:
+        - service: alarm_control_panel.alarm_arm_away
+          entity_id: !input alarm
+    - conditions:
+        - condition: and
+          conditions:
+            - condition: trigger
+              id: keypad_arm_home
+            - condition: state
+              entity_id: !input alarm
+              state: disarmed
+      sequence:
+        - service: alarm_control_panel.alarm_arm_home
+          entity_id: !input alarm
+    - conditions:
+        - condition: trigger
+          id: invalid_code
+      sequence:
+        - service: zwave_js.set_value
+          target: !input keypad
+          data:
+            command_class: "135"
+            endpoint: "0"
+            property: "9"
+            property_key: "1"
+            value: 1
+    - conditions:
+        - condition: trigger
+          id: alarm_disarmed
+      sequence:
+        - service: zwave_js.set_value
+          target: !input keypad
+          data:
+            command_class: "135"
+            endpoint: "0"
+            property: "2"
+            property_key: "1"
+            value: 1
+    - conditions:
+        - condition: trigger
+          id: alarm_armed_away
+      sequence:
+        - service: zwave_js.set_value
+          target: !input keypad
+          data:
+            command_class: "135"
+            endpoint: "0"
+            property: "11"
+            property_key: "1"
+            value: 1
+    - conditions:
+        - condition: trigger
+          id: alarm_armed_home
+      sequence:
+        - service: zwave_js.set_value
+          target: !input keypad
+          data:
+            command_class: "135"
+            endpoint: "0"
+            property: "10"
+            property_key: "1"
+            value: 1
+    - conditions:
+        - condition: trigger
+          id: alarm_arming
+      sequence:
+        - service: zwave_js.set_value
+          target: !input keypad
+          data:
+            command_class: "135"
+            endpoint: "0"
+            property: "18"
+            property_key: "7"
+            value: "{{ state_attr(alarm, 'delay')}}"
+    - conditions:
+        - condition: trigger
+          id: alarm_pending
+      sequence:
+        - service: zwave_js.set_value
+          target: !input keypad
+          data:
+            command_class: "135"
+            endpoint: "0"
+            property: "17"
+            property_key: "7"
+            value: "{{ state_attr(alarm, 'delay')}}"
+    - conditions:
+        - condition: trigger
+          id: alarm_triggered
+      sequence:
+        - service: zwave_js.set_value
+          target: !input keypad
+          data:
+            command_class: "135"
+            endpoint: "0"
+            property: "13"
+            property_key: "1"
+            value: 1
