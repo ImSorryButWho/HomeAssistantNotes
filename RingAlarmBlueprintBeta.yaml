@@ -62,6 +62,11 @@ trigger:
     event_data:
       reason: "invalid_code"
     id: invalid_code
+  - platform: event
+    event_type: "alarmo_failed_to_arm"
+    event_data:
+      reason: "open_sensors"
+    id: need_bypass
   - platform: state
     entity_id: !input alarm
     to: disarmed
@@ -130,6 +135,18 @@ action:
             command_class: "135"
             endpoint: "0"
             property: "9"
+            property_key: "1"
+            value: 1
+    - conditions:
+      - condition: trigger
+        id: need_bypass
+      sequence:
+        - service: zwave_js.set_value
+          target: !input keypad
+          data:
+            command_class: "135"
+            endpoint: "0"
+            property: "16"
             property_key: "1"
             value: 1
     - conditions:
