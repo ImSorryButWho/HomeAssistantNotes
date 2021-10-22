@@ -1,5 +1,5 @@
 blueprint:
-  name: Ring Keypad Automations
+  name: Ring Keypad Automations - Beta
   description: Automations to use the Ring Keypad with an Alarm Panel integration.  See https://github.com/ImSorryButWho/HomeAssistantNotes/blob/main/RingKeypadV2.md for more information.
   domain: automation
   input:
@@ -24,22 +24,8 @@ blueprint:
       selector:
         entity:
           domain: alarm_control_panel
-    entry_delay:
-      name: Entry Delay
-      description: Entry delay before alarm sounds (in seconds).  Should be set to the same value as the alarm is configured for.
-      selector:
-        number:
-          min: 0
-          max: 240
-          unit_of_measurement: seconds
-    exit_delay:
-      name: Exit Delay
-      description: Exit delay before alarm is armed (in seconds).  Should be set to the same value as the alarm is configured for.
-      selector:
-        number:
-          min: 0
-          max: 240
-          unit_of_measurement: seconds
+variables:
+  alarm: !input alarm
 mode: parallel
 max: 10
 trigger:
@@ -70,7 +56,7 @@ trigger:
       command_class: 111
       node_id: !input keypad_node_id
       event_type: 6
-    id: keypad_arm_home
+    id: keypad_arm_homea
   - platform: event
     event_type: "alarmo_failed_to_arm"
     event_data:
@@ -193,7 +179,7 @@ action:
             endpoint: "0"
             property: "18"
             property_key: "7"
-            value: !input exit_delay
+            value: "{{ state_attr(alarm, 'delay')}}"
     - conditions:
         - condition: trigger
           id: alarm_pending
@@ -205,7 +191,7 @@ action:
             endpoint: "0"
             property: "17"
             property_key: "7"
-            value: !input entry_delay
+            value: "{{ state_attr(alarm, 'delay')}}"
     - conditions:
         - condition: trigger
           id: alarm_triggered
