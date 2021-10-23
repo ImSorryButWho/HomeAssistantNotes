@@ -106,18 +106,19 @@ action:
               state: 
                 - "disarmed"
                 - "armed_home"
-      choose:
-        - conditions:
-            - condition: "{{ trigger.event.data.event_data != '' }}"
-          sequence:
-            - service: alarm_control_panel.alarm_arm_away
-              entity_id: !input alarm
-              data:
-                code: "{{ trigger.event.data.event_data }}"
-      default:
         sequence:
-          - service: alarm_control_panel.alarm_arm_away
-            entity_id: !input alarm
+          choose:
+            - conditions:
+              - condition: "{{ trigger.event.data.event_data != '' }}"
+                sequence:
+                  - service: alarm_control_panel.alarm_arm_away
+                    entity_id: !input alarm
+                    data:
+                      code: "{{ trigger.event.data.event_data }}"
+            default:
+              sequence:
+                - service: alarm_control_panel.alarm_arm_away
+                  entity_id: !input alarm
     - conditions:
         - condition: and
           conditions:
@@ -127,18 +128,19 @@ action:
               entity_id: !input alarm
               state: 
                 - "disarmed"
-      choose:
-        - conditions:
-            - condition: "{{ trigger.event.data.event_data != '' }}"
-          sequence:
-            - service: alarm_control_panel.alarm_arm_home
-              entity_id: !input alarm
-              data:
-                code: "{{ trigger.event.data.event_data }}"
-      default:
         sequence:
-          - service: alarm_control_panel.alarm_arm_home
-            entity_id: !input alarm
+          choose:
+            - conditions:
+              - condition: "{{ trigger.event.data.event_data != '' }}"
+                sequence:
+                  - service: alarm_control_panel.alarm_arm_home
+                    entity_id: !input alarm
+                    data:
+                      code: "{{ trigger.event.data.event_data }}"
+            default:
+              sequence:
+                - service: alarm_control_panel.alarm_arm_home
+                  entity_id: !input alarm
     - conditions:
         - condition: trigger
           id: 
