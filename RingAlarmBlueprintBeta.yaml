@@ -92,7 +92,7 @@ action:
             - code_entered
             - keypad_disarm
       sequence:
-        - service: alarm_control_panel.alarm_disarm
+        - service: !input alarm_disarm
           entity_id: !input alarm
           data:
             code: "{{ trigger.event.data.event_data }}"
@@ -103,21 +103,23 @@ action:
               id: keypad_arm_away
             - condition: state
               entity_id: !input alarm
-              state: 
+              state:
                 - "disarmed"
                 - "armed_home"
       sequence:
-        choose:
-          - conditions:
-            - condition: "{{ trigger.event.data.event_data != '' }}"
+        - choose:
+            - conditions:
+                condition: template
+                value_template: "{{ trigger.event.data.event_data | length > 0 }}"
               sequence:
                 - service: alarm_control_panel.alarm_arm_away
-                  entity_id: !input alarm
+                  target:
+                    entity_id: !input alarm
                   data:
                     code: "{{ trigger.event.data.event_data }}"
           default:
-            sequence:
-              - service: alarm_control_panel.alarm_arm_away
+            - service: alarm_control_panel.alarm_arm_away
+              target:
                 entity_id: !input alarm
     - conditions:
         - condition: and
@@ -126,28 +128,30 @@ action:
               id: keypad_arm_home
             - condition: state
               entity_id: !input alarm
-              state: 
+              state:
                 - "disarmed"
       sequence:
-        choose:
-          - conditions:
-            - condition: "{{ trigger.event.data.event_data != '' }}"
+        - choose:
+            - conditions:
+                condition: template
+                value_template: "{{ trigger.event.data.event_data | length > 0 }}"
               sequence:
                 - service: alarm_control_panel.alarm_arm_home
-                  entity_id: !input alarm
+                  target:
+                    entity_id: !input alarm
                   data:
                     code: "{{ trigger.event.data.event_data }}"
           default:
-            sequence:
-              - service: alarm_control_panel.alarm_arm_home
+            - service: alarm_control_panel.alarm_arm_home
+              target:
                 entity_id: !input alarm
     - conditions:
         - condition: trigger
-          id: 
+          id:
             - invalid_code
       sequence:
         - service: zwave_js.set_value
-          target: 
+          target:
             device_id: !input keypad
           data:
             command_class: "135"
@@ -156,11 +160,11 @@ action:
             property_key: "1"
             value: 1
     - conditions:
-      - condition: trigger
-        id: need_bypass
+        - condition: trigger
+          id: need_bypass
       sequence:
         - service: zwave_js.set_value
-          target: 
+          target:
             device_id: !input keypad
           data:
             command_class: "135"
@@ -173,7 +177,7 @@ action:
           id: alarm_disarmed
       sequence:
         - service: zwave_js.set_value
-          target: 
+          target:
             device_id: !input keypad
           data:
             command_class: "135"
@@ -186,7 +190,7 @@ action:
           id: alarm_armed_away
       sequence:
         - service: zwave_js.set_value
-          target: 
+          target:
             device_id: !input keypad
           data:
             command_class: "135"
@@ -199,7 +203,7 @@ action:
           id: alarm_armed_home
       sequence:
         - service: zwave_js.set_value
-          target: 
+          target:
             device_id: !input keypad
           data:
             command_class: "135"
@@ -212,33 +216,33 @@ action:
           id: alarm_arming
       sequence:
         - service: zwave_js.set_value
-          target: 
+          target:
             device_id: !input keypad
           data:
             command_class: "135"
             endpoint: "0"
             property: "18"
             property_key: "7"
-            value: "{{ state_attr(alarm, 'delay')}}"
+            value: "{{ state_attr(alarm, 'delay') }}"
     - conditions:
         - condition: trigger
           id: alarm_pending
       sequence:
         - service: zwave_js.set_value
-          target: 
+          target:
             device_id: !input keypad
           data:
             command_class: "135"
             endpoint: "0"
             property: "17"
             property_key: "7"
-            value: "{{ state_attr(alarm, 'delay')}}"
+            value: "{{ state_attr(alarm, 'delay') }}"
     - conditions:
         - condition: trigger
           id: alarm_triggered
       sequence:
         - service: zwave_js.set_value
-          target: 
+          target:
             device_id: !input keypad
           data:
             command_class: "135"
