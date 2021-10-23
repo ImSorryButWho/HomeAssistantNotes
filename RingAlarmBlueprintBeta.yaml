@@ -15,6 +15,7 @@ blueprint:
       selector:
         entity:
           domain: alarm_control_panel
+          integration: alarmo
 variables:
   alarm: !input alarm
 mode: parallel
