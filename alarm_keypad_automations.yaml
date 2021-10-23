@@ -1,5 +1,5 @@
 blueprint:
-  name: Ring Keypad Automations - Beta
+  name: Ring Keypad Automations
   description: Automations to use the Ring Keypad with an Alarm Panel integration.  See https://github.com/ImSorryButWho/HomeAssistantNotes/blob/main/RingKeypadV2.md for more information.
   domain: automation
   input:
