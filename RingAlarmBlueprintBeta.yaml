@@ -27,13 +27,6 @@ trigger:
     event_data:
       command_class: 111
       device_id: !input keypad
-      event_type: 0
-    id: timed_out
-  - platform: event
-    event_type: "zwave_js_notification"
-    event_data:
-      command_class: 111
-      device_id: !input keypad
       event_type: 2
     id: code_entered
   - platform: event
@@ -110,10 +103,21 @@ action:
               id: keypad_arm_away
             - condition: state
               entity_id: !input alarm
-              state: "disarmed"
-      sequence:
-        - service: alarm_control_panel.alarm_arm_away
-          entity_id: !input alarm
+              state: 
+                - "disarmed"
+                - "armed_home"
+      choose:
+        - conditions:
+            - condition: "{{ trigger.event.data.event_data != '' }}"
+          sequence:
+            - service: alarm_control_panel.alarm_arm_away
+              entity_id: !input alarm
+              data:
+                code: "{{ trigger.event.data.event_data }}"
+      default:
+        sequence:
+          - service: alarm_control_panel.alarm_arm_away
+            entity_id: !input alarm
     - conditions:
         - condition: and
           conditions:
@@ -121,15 +125,24 @@ action:
               id: keypad_arm_home
             - condition: state
               entity_id: !input alarm
-              state: disarmed
-      sequence:
-        - service: alarm_control_panel.alarm_arm_home
-          entity_id: !input alarm
+              state: 
+                - "disarmed"
+      choose:
+        - conditions:
+            - condition: "{{ trigger.event.data.event_data != '' }}"
+          sequence:
+            - service: alarm_control_panel.alarm_arm_home
+              entity_id: !input alarm
+              data:
+                code: "{{ trigger.event.data.event_data }}"
+      default:
+        sequence:
+          - service: alarm_control_panel.alarm_arm_home
+            entity_id: !input alarm
     - conditions:
         - condition: trigger
           id: 
             - invalid_code
-            - timed_out
       sequence:
         - service: zwave_js.set_value
           target: 
