@@ -92,7 +92,7 @@ action:
             - code_entered
             - keypad_disarm
       sequence:
-        - service: !input alarm_disarm
+        - service: alarm_control_panel.alarm_disarm
           entity_id: !input alarm
           data:
             code: "{{ trigger.event.data.event_data }}"
