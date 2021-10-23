@@ -7,17 +7,8 @@ blueprint:
       name: Keypad Device
       description: The device entry for the Ring keypad
       selector:
-        target:
-          device:
-            integration: zwave_js
-    keypad_node_id:
-      name: Keypad Z-Wave Node ID
-      description: The Z-Wave Node ID for the Ring Keypad
-      selector:
-        number:
-          min: 1
-          max: 254
-          mode: box
+        device:
+          integration: zwave_js
     alarm:
       name: Alarm Control Panel entity
       description: The Alarm Control Panel to synchronize the keypad with
@@ -33,28 +24,28 @@ trigger:
     event_type: "zwave_js_notification"
     event_data:
       command_class: 111
-      node_id: !input keypad_node_id
+      device_id: !input keypad
       event_type: 2
     id: code_entered
   - platform: event
     event_type: "zwave_js_notification"
     event_data:
       command_class: 111
-      node_id: !input keypad_node_id
+      device_id: !input keypad
       event_type: 3
     id: keypad_disarm
   - platform: event
     event_type: "zwave_js_notification"
     event_data:
       command_class: 111
-      node_id: !input keypad_node_id
+      device_id: !input keypad
       event_type: 5
     id: keypad_arm_away
   - platform: event
     event_type: "zwave_js_notification"
     event_data:
       command_class: 111
-      node_id: !input keypad_node_id
+      device_id: !input keypad
       event_type: 6
     id: keypad_arm_home
   - platform: event
@@ -130,7 +121,8 @@ action:
           id: invalid_code
       sequence:
         - service: zwave_js.set_value
-          target: !input keypad
+          target: 
+            device_id: !input keypad
           data:
             command_class: "135"
             endpoint: "0"
@@ -142,7 +134,8 @@ action:
         id: need_bypass
       sequence:
         - service: zwave_js.set_value
-          target: !input keypad
+          target: 
+            device_id: !input keypad
           data:
             command_class: "135"
             endpoint: "0"
@@ -154,7 +147,8 @@ action:
           id: alarm_disarmed
       sequence:
         - service: zwave_js.set_value
-          target: !input keypad
+          target: 
+            device_id: !input keypad
           data:
             command_class: "135"
             endpoint: "0"
@@ -166,7 +160,8 @@ action:
           id: alarm_armed_away
       sequence:
         - service: zwave_js.set_value
-          target: !input keypad
+          target: 
+            device_id: !input keypad
           data:
             command_class: "135"
             endpoint: "0"
@@ -178,7 +173,8 @@ action:
           id: alarm_armed_home
       sequence:
         - service: zwave_js.set_value
-          target: !input keypad
+          target: 
+            device_id: !input keypad
           data:
             command_class: "135"
             endpoint: "0"
@@ -190,7 +186,8 @@ action:
           id: alarm_arming
       sequence:
         - service: zwave_js.set_value
-          target: !input keypad
+          target: 
+            device_id: !input keypad
           data:
             command_class: "135"
             endpoint: "0"
@@ -202,7 +199,8 @@ action:
           id: alarm_pending
       sequence:
         - service: zwave_js.set_value
-          target: !input keypad
+          target: 
+            device_id: !input keypad
           data:
             command_class: "135"
             endpoint: "0"
@@ -214,7 +212,8 @@ action:
           id: alarm_triggered
       sequence:
         - service: zwave_js.set_value
-          target: !input keypad
+          target: 
+            device_id: !input keypad
           data:
             command_class: "135"
             endpoint: "0"
