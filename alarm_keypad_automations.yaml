@@ -1,63 +1,222 @@
-- id: "disarm_alarm_from_keypad"
-  alias: "Disarm alarm from keypad"
-  trigger:
-    platform: event
+blueprint:
+  name: Ring Keypad Automations - Beta
+  description: Automations to use the Ring Keypad with an Alarm Panel integration.  See https://github.com/ImSorryButWho/HomeAssistantNotes/blob/main/RingKeypadV2.md for more information.
+  domain: automation
+  input:
+    keypad:
+      name: Keypad Device
+      description: The device entry for the Ring keypad
+      selector:
+        device:
+          integration: zwave_js
+    alarm:
+      name: Alarm Control Panel entity
+      description: The Alarm Control Panel to synchronize the keypad with
+      selector:
+        entity:
+          domain: alarm_control_panel
+variables:
+  alarm: !input alarm
+mode: parallel
+max: 10
+trigger:
+  - platform: event
     event_type: "zwave_js_notification"
     event_data:
       command_class: 111
-      node_id: 162
+      device_id: !input keypad
       event_type: 2
-  action:
-    - service: alarm_control_panel.alarm_disarm
-      entity_id: alarm_control_panel.alarm
-      data:
-        code: "{{ trigger.event.data.event_data }}"
-- id: "arm_home_from_keypad"
-  alias: "Arm alarm home from keypad"
-  trigger:
-    platform: event
+    id: code_entered
+  - platform: event
     event_type: "zwave_js_notification"
     event_data:
       command_class: 111
-      node_id: 162
-      event_type: 6
-  condition:
-    - condition: state
-      entity_id: alarm_control_panel.alarm
-      state: "disarmed"
-  action:
-    - service: alarm_control_panel.alarm_arm_home
-      entity_id: alarm_control_panel.alarm
-- id: "arm_away_from_keypad"
-  alias: "Arm alarm away from keypad"
-  trigger:
-    platform: event
+      device_id: !input keypad
+      event_type: 3
+    id: keypad_disarm
+  - platform: event
     event_type: "zwave_js_notification"
     event_data:
       command_class: 111
-      node_id: 162
+      device_id: !input keypad
       event_type: 5
-  condition:
-    - condition: state
-      entity_id: alarm_control_panel.alarm
-      state: "disarmed"
-  action:
-    - service: alarm_control_panel.alarm_arm_away
-      entity_id: alarm_control_panel.alarm
-- id: "alert_for_invalid_code"
-  alias: "Alert for invalid code on keypad"
-  trigger:
-    platform: event
+    id: keypad_arm_away
+  - platform: event
+    event_type: "zwave_js_notification"
+    event_data:
+      command_class: 111
+      device_id: !input keypad
+      event_type: 6
+    id: keypad_arm_home
+  - platform: event
     event_type: "alarmo_failed_to_arm"
     event_data:
       reason: "invalid_code"
-  action:
-    - service: zwave_js.set_value
-      target:
-        entity_id: sensor.ring_keypad_v2_battery_level
-      data:
-        command_class: "135"
-        endpoint: "0"
-        property: "9"
-        property_key: "1"
-        value: 1
+    id: invalid_code
+  - platform: event
+    event_type: "alarmo_failed_to_arm"
+    event_data:
+      reason: "open_sensors"
+    id: need_bypass
+  - platform: state
+    entity_id: !input alarm
+    to: disarmed
+    id: alarm_disarmed
+  - platform: state
+    entity_id: !input alarm
+    to: arming
+    id: alarm_arming
+  - platform: state
+    entity_id: !input alarm
+    to: armed_away
+    id: alarm_armed_away
+  - platform: state
+    entity_id: !input alarm
+    to: armed_home
+    id: alarm_armed_home
+  - platform: state
+    entity_id: !input alarm
+    to: pending
+    id: alarm_pending
+  - platform: state
+    entity_id: !input alarm
+    to: triggered
+    id: alarm_triggered
+action:
+  choose:
+    - conditions:
+        - condition: trigger
+          id:
+            - code_entered
+            - keypad_disarm
+      sequence:
+        - service: alarm_control_panel.alarm_disarm
+          entity_id: !input alarm
+          data:
+            code: "{{ trigger.event.data.event_data }}"
+    - conditions:
+        - condition: and
+          conditions:
+            - condition: trigger
+              id: keypad_arm_away
+            - condition: state
+              entity_id: !input alarm
+              state: "disarmed"
+      sequence:
+        - service: alarm_control_panel.alarm_arm_away
+          entity_id: !input alarm
+    - conditions:
+        - condition: and
+          conditions:
+            - condition: trigger
+              id: keypad_arm_home
+            - condition: state
+              entity_id: !input alarm
+              state: disarmed
+      sequence:
+        - service: alarm_control_panel.alarm_arm_home
+          entity_id: !input alarm
+    - conditions:
+        - condition: trigger
+          id: invalid_code
+      sequence:
+        - service: zwave_js.set_value
+          target: 
+            device_id: !input keypad
+          data:
+            command_class: "135"
+            endpoint: "0"
+            property: "9"
+            property_key: "1"
+            value: 1
+    - conditions:
+      - condition: trigger
+        id: need_bypass
+      sequence:
+        - service: zwave_js.set_value
+          target: 
+            device_id: !input keypad
+          data:
+            command_class: "135"
+            endpoint: "0"
+            property: "16"
+            property_key: "1"
+            value: 1
+    - conditions:
+        - condition: trigger
+          id: alarm_disarmed
+      sequence:
+        - service: zwave_js.set_value
+          target: 
+            device_id: !input keypad
+          data:
+            command_class: "135"
+            endpoint: "0"
+            property: "2"
+            property_key: "1"
+            value: 1
+    - conditions:
+        - condition: trigger
+          id: alarm_armed_away
+      sequence:
+        - service: zwave_js.set_value
+          target: 
+            device_id: !input keypad
+          data:
+            command_class: "135"
+            endpoint: "0"
+            property: "11"
+            property_key: "1"
+            value: 1
+    - conditions:
+        - condition: trigger
+          id: alarm_armed_home
+      sequence:
+        - service: zwave_js.set_value
+          target: 
+            device_id: !input keypad
+          data:
+            command_class: "135"
+            endpoint: "0"
+            property: "10"
+            property_key: "1"
+            value: 1
+    - conditions:
+        - condition: trigger
+          id: alarm_arming
+      sequence:
+        - service: zwave_js.set_value
+          target: 
+            device_id: !input keypad
+          data:
+            command_class: "135"
+            endpoint: "0"
+            property: "18"
+            property_key: "7"
+            value: "{{ state_attr(alarm, 'delay')}}"
+    - conditions:
+        - condition: trigger
+          id: alarm_pending
+      sequence:
+        - service: zwave_js.set_value
+          target: 
+            device_id: !input keypad
+          data:
+            command_class: "135"
+            endpoint: "0"
+            property: "17"
+            property_key: "7"
+            value: "{{ state_attr(alarm, 'delay')}}"
+    - conditions:
+        - condition: trigger
+          id: alarm_triggered
+      sequence:
+        - service: zwave_js.set_value
+          target: 
+            device_id: !input keypad
+          data:
+            command_class: "135"
+            endpoint: "0"
+            property: "13"
+            property_key: "1"
+            value: 1
