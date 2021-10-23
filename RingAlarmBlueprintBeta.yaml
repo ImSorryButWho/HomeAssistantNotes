@@ -8,6 +8,7 @@ blueprint:
       description: The device entry for the Ring keypad
       selector:
         device:
+          manufacturer: Ring
           integration: zwave_js
     alarm:
       name: Alarm Control Panel entity
@@ -21,6 +22,13 @@ variables:
 mode: parallel
 max: 10
 trigger:
+  - platform: event
+    event_type: "zwave_js_notification"
+    event_data:
+      command_class: 111
+      device_id: !input keypad
+      event_type: 0
+    id: timed_out
   - platform: event
     event_type: "zwave_js_notification"
     event_data:
@@ -119,7 +127,9 @@ action:
           entity_id: !input alarm
     - conditions:
         - condition: trigger
-          id: invalid_code
+          id: 
+            - invalid_code
+            - timed_out
       sequence:
         - service: zwave_js.set_value
           target: 
