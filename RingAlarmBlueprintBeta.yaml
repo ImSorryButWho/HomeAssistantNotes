@@ -110,7 +110,7 @@ action:
         - choose:
             - conditions:
                 condition: template
-                value_template: "{{ trigger.event.data.event_data | length > 0 }}"
+                value_template: "{{ trigger.event.data.event_data is not none }}"
               sequence:
                 - service: alarm_control_panel.alarm_arm_away
                   target:
@@ -134,7 +134,7 @@ action:
         - choose:
             - conditions:
                 condition: template
-                value_template: "{{ trigger.event.data.event_data | length > 0 }}"
+                value_template: "{{ trigger.event.data.event_data is not none }}"
               sequence:
                 - service: alarm_control_panel.alarm_arm_home
                   target:
