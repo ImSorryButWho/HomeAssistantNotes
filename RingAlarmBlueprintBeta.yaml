@@ -84,6 +84,11 @@ trigger:
     entity_id: !input alarm
     to: triggered
     id: alarm_triggered
+condition:
+  condition: not
+  conditions:
+    - condition: template
+      value_template: "{{ (trigger.from_state.state is not none) and (trigger.from_state.state == 'unknown') }}"
 action:
   choose:
     - conditions:
