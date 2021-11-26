@@ -114,6 +114,8 @@ action:
       sequence:
         - service: alarm_control_panel.alarm_arm_away
           entity_id: !input alarm
+          data:
+            code: "{{ trigger.event.data.event_data }}"
     - conditions:
         - condition: and
           conditions:
@@ -125,6 +127,8 @@ action:
       sequence:
         - service: alarm_control_panel.alarm_arm_home
           entity_id: !input alarm
+          data:
+            code: "{{ trigger.event.data.event_data }}"
     - conditions:
         - condition: trigger
           id: invalid_code
