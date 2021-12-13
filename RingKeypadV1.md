@@ -112,8 +112,7 @@ The following tables summarize the indicators by `property`s that actually do an
 | 17 | Armed Stay. But silent. |
 | 2 | Armed Away. Keypad says "Away and armed," armed away light lights up on motion. |
 | 18 | Armed Away. But silent. |
-| 12 | Generic alarm. Plays alarm, flashes light until another mode is selected.  Does not respect duration (property_key 7). |
-| 13 | Burglar alarm. Identical to 12. |
+| 4 | Burglar alarm. Plays alarm, flashes light until another mode is selected.  Does not respect duration (property_key 7). |
 | 5 | Keypad says "Sensors require bypass." Enter button blinks. |
 | 5 | Same as 5, but silent. |
 | 20 | Medical alarm. Medical button lights, bar flashes.  No alarm sound plays. Does not respect duration (property_key 7). |
