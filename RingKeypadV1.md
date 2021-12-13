@@ -93,9 +93,9 @@ For example, to set the keypad to disarmed mode, we can run the following comman
     data:
       command_class: '135'
       endpoint: '0'
-      property: '2'
-      property_key: '1'
-      value: 1
+      property: 'value'
+      #property_key: '1'
+      value: 3
       
 You can use any `entity_id` associated with the keypad, or find the device id and use that.  `command_class` will always be 135 (the indicator command class), and `endpoint` will always be 0.  For most messages, I find it makes sense to use a `property_key` of 1 and `value` of 1, just indicating that the indicator should be turned on (meaning that we're playing a message or changing the mode of the keypad).  For indicators where a time make sense (e.g. entry delay, exit delay or alarms), use `property_key` 7 and a value of the number of seconds you want it to last.
 
