@@ -162,7 +162,7 @@ action:
             command_class: "135"
             endpoint: "0"
             property: "value"
-            property_key: "1"
+            #property_key: "1"
             value: 8
     - conditions:
         - condition: trigger
@@ -175,7 +175,7 @@ action:
             command_class: "135"
             endpoint: "0"
             property: "value"
-            property_key: "1"
+            #property_key: "1"
             value: 5
     - conditions:
         - condition: trigger
@@ -188,7 +188,7 @@ action:
             command_class: "135"
             endpoint: "0"
             property: "value"
-            property_key: "1"
+            #property_key: "1"
             value: 3
     - conditions:
         - condition: trigger
@@ -201,7 +201,7 @@ action:
             command_class: "135"
             endpoint: "0"
             property: "value"
-            property_key: "1"
+            #property_key: "1"
             value: 2
     - conditions:
         - condition: trigger
@@ -214,7 +214,7 @@ action:
             command_class: "135"
             endpoint: "0"
             property: "value"
-            property_key: "1"
+            #property_key: "1"
             value: 1
     - conditions:
         - condition: trigger
@@ -227,7 +227,7 @@ action:
             command_class: "135"
             endpoint: "0"
             property: "value"
-            property_key: "7"
+            #property_key: "7"
             value: "23"
             #value: "{{ state_attr(alarm, 'delay') }}"
     - conditions:
@@ -241,7 +241,7 @@ action:
             command_class: "135"
             endpoint: "0"
             property: "value"
-            property_key: "7"
+            #property_key: "7"
             value: "22"
             #value: "{{ state_attr(alarm, 'delay') }}"
     - conditions:
@@ -255,5 +255,5 @@ action:
             command_class: "135"
             endpoint: "0"
             property: "value"
-            property_key: "1"
+            #property_key: "1"
             value: 4
