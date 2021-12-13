@@ -161,9 +161,9 @@ action:
           data:
             command_class: "135"
             endpoint: "0"
-            property: "8"
+            property: "value"
             property_key: "1"
-            value: 1
+            value: 8
     - conditions:
         - condition: trigger
           id: need_bypass
@@ -174,9 +174,9 @@ action:
           data:
             command_class: "135"
             endpoint: "0"
-            property: "5"
+            property: "value"
             property_key: "1"
-            value: 1
+            value: 5
     - conditions:
         - condition: trigger
           id: alarm_disarmed
@@ -187,9 +187,9 @@ action:
           data:
             command_class: "135"
             endpoint: "0"
-            property: "3"
+            property: "value"
             property_key: "1"
-            value: 1
+            value: 3
     - conditions:
         - condition: trigger
           id: alarm_armed_away
@@ -200,9 +200,9 @@ action:
           data:
             command_class: "135"
             endpoint: "0"
-            property: "2"
+            property: "value"
             property_key: "1"
-            value: 1
+            value: 2
     - conditions:
         - condition: trigger
           id: alarm_armed_home
@@ -213,7 +213,7 @@ action:
           data:
             command_class: "135"
             endpoint: "0"
-            property: "1"
+            property: "value"
             property_key: "1"
             value: 1
     - conditions:
@@ -226,9 +226,10 @@ action:
           data:
             command_class: "135"
             endpoint: "0"
-            property: "23"
+            property: "value"
             property_key: "7"
-            value: "{{ state_attr(alarm, 'delay') }}"
+            value: "23"
+            #value: "{{ state_attr(alarm, 'delay') }}"
     - conditions:
         - condition: trigger
           id: alarm_pending
@@ -239,9 +240,10 @@ action:
           data:
             command_class: "135"
             endpoint: "0"
-            property: "22"
+            property: "value"
             property_key: "7"
-            value: "{{ state_attr(alarm, 'delay') }}"
+            value: "22"
+            #value: "{{ state_attr(alarm, 'delay') }}"
     - conditions:
         - condition: trigger
           id: alarm_triggered
@@ -252,6 +254,6 @@ action:
           data:
             command_class: "135"
             endpoint: "0"
-            property: "4"
+            property: "value"
             property_key: "1"
-            value: 1
+            value: 4
