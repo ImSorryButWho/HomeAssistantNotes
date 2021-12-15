@@ -77,7 +77,6 @@ For example, to set the keypad to disarmed mode, we can run the following comman
       command_class: '135'
       endpoint: '0'
       property: 'value' #this is not a placeholder!
-      #property_key: '1'
       value: 3
       
 You can use any `entity_id` associated with the keypad, or find the device id and use that.  `command_class` will always be 135 (the indicator command class), and `endpoint` will always be 0.
