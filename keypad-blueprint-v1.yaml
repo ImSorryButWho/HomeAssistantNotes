@@ -201,7 +201,6 @@ action:
             command_class: "135"
             endpoint: "0"
             property: "value"
-            #property_key: "1"
             value: 2
     - conditions:
         - condition: trigger
@@ -214,7 +213,6 @@ action:
             command_class: "135"
             endpoint: "0"
             property: "value"
-            #property_key: "1"
             value: 1
     - conditions:
         - condition: trigger
@@ -227,9 +225,7 @@ action:
             command_class: "135"
             endpoint: "0"
             property: "value"
-            #property_key: "7"
-            value: "23"
-            #value: "{{ state_attr(alarm, 'delay') }}"
+            value: {{ 23 if state_attr(alarm, 'delay') == 15 else 39 if state_attr(alarm, 'delay') == 30 else 55 if state_attr(alarm, 'delay') == 45 else 8 }}
     - conditions:
         - condition: trigger
           id: alarm_pending
@@ -241,9 +237,7 @@ action:
             command_class: "135"
             endpoint: "0"
             property: "value"
-            #property_key: "7"
-            value: "22"
-            #value: "{{ state_attr(alarm, 'delay') }}"
+            value: {{ 22 if state_attr(alarm, 'delay') == 15 else 38 if state_attr(alarm, 'delay') == 30 else 54 if state_attr(alarm, 'delay') == 45 else 8 }}
     - conditions:
         - condition: trigger
           id: alarm_triggered
@@ -255,5 +249,4 @@ action:
             command_class: "135"
             endpoint: "0"
             property: "value"
-            #property_key: "1"
             value: 4
