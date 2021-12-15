@@ -1,26 +1,12 @@
-# Ring Keypad v2 With Home Assistant
-
-I've been looking for a physical alarm keypad to use with Home Assistant for quite a while, and have't found any good options.  I was excited when I found out that the [Ring Alarm Keypad](https://ring.com/products/alarm-keypad-v2) is [Z-Wave based](https://support.ring.com/hc/en-us/articles/360042696611-Ring-Alarm-Keypad-2nd-gen-Z-Wave-Technical-Manual) and widely available, but I was never able to get it working with HA.  Until very recently.
+# Ring Keypad v1 With Home Assistant
 
 It turns out that for full functionality the keypad must be paired with S2 security, the higher-security Z-Wave mode which wasn't supported by any open-source projects.  Until [August 2021](https://github.com/zwave-js/node-zwave-js/releases/tag/v8.1.0), when ZWaveJS added support for S2.  [ZWaveJS2MQTT](https://github.com/zwave-js/zwavejs2mqtt) added support for S2 soon after, which was the key to using the Ring Keypad with Home Assistant successfully.
 
-In this document, I'll talk about how to use the Ring keypad with Home Assistant, taking full advantage of all the functionality it offers.  In my opinion, this is by far the most polished option for an alarm keypad that works with HA available currently
-
 ## Pairing
-
-As of this writing, ZWaveJS2MQTT is the only method I can find to successfully pair the keypad with Home Assistant with full functionality.  I assume the standard ZWaveJS implementation will gain support for S2 security eventually, but currently (October 2021) the UI doesn't support it.
-
-So, to make this work, be sure you're using ZWaveJS2MQTT.  The easiest way to do that is via the [community add-on](https://github.com/hassio-addons/addon-zwavejs2mqtt), which is part of the default add-on store.  Migrating from the standard ZWaveJS add-on to ZWaveJS2MQTT is out of the scope of this document, but should be straightforward.
-
-If you haven't set up any devices with S2 security before, you likely don't have S2 keys defined.  In the ZWaveJS2MQTT settings page ZWave area, click the two arrows button next to the three S2 keys to generate new ones.  (Of course, don't do this if you already have keys defined, or you'll lose the ability to control whatever devices you already have paired!)
-
-There's one issue I've had with this keypad: the security negotiation seems to time out quickly.  I found I need to have the DSK PIN (from the QR code on the back of the keypad) entered within a couple of seconds, or security negotiation fails.  I'd strongly suggest you type the PIN into a text document and copy it to your clipboard, ready to paste in as soon as ZWaveJS2MQTT asks for it.
 
 Now you're ready to pair.  Plug the keypad into a power outlet (it will not pair on batteries).  Start inclusion by clicking "Manage Nodes" on the main ZWaveJS2MQTT page, then selecting Default mode.  Once inclusion mode starts, hold down the 1 key on the keypad until the green indicator starts flashing.
 
-Eventually, a security choice pop-up will appear.  Click next quickly, and the DSK prompt will appear.  Paste in the PIN you copied earlier and click next quickly.  In a few seconds, you should see confirmation that it was paired with S2 Access Control.  If not, you'll need to try again.
-
-If it failed, go to Manage Nodes -> Exclusion, and while you're in exclusion mode insert the reset pin that was included in the box in the hole on the back of the keypad.  Try the inclusion process again.  It took me a few tries to get it paired, but I eventually succeeded.
+Eventually, a security choice pop-up will appear.  Click next quickly, and the DSK prompt will appear.  Paste in the PIN that you can find on the back of the keypad and click next quickly.  In a few seconds, you should see confirmation that it was paired with S2 Access Control.  If not, you'll need to try again.
 
 ## Entry Control (receiving button events)
 
@@ -57,10 +43,7 @@ This event was generated from entering the code "1234", and pressing the Enter b
 | 2 | Enter |
 | 3 | Disarm |
 | 5 | Arm Away |
-| 6 | Arm Stay |
-| 16 | Fire (not sent unless button is held down until all 3 lights go out) |
-| 17 | Police (not sent unless button is held down until all 3 lights go out) |
-| 19 | Medical (not sent unless button is held down until all 3 lights go out) |
+| 6 | Arm Stay |]
 | 25 | Cancel |
 
 To use this, you'll want to create some Home Assistant automations like:
@@ -93,11 +76,11 @@ For example, to set the keypad to disarmed mode, we can run the following comman
     data:
       command_class: '135'
       endpoint: '0'
-      property: 'value'
+      property: 'value' #this is not a placeholder!
       #property_key: '1'
       value: 3
       
-You can use any `entity_id` associated with the keypad, or find the device id and use that.  `command_class` will always be 135 (the indicator command class), and `endpoint` will always be 0.  For most messages, I find it makes sense to use a `property_key` of 1 and `value` of 1, just indicating that the indicator should be turned on (meaning that we're playing a message or changing the mode of the keypad).  For indicators where a time make sense (e.g. entry delay, exit delay or alarms), use `property_key` 7 and a value of the number of seconds you want it to last.
+You can use any `entity_id` associated with the keypad, or find the device id and use that.  `command_class` will always be 135 (the indicator command class), and `endpoint` will always be 0.
 
 The following tables summarize the indicators by `property`s that actually do anything that I can find.
 
@@ -114,15 +97,18 @@ The following tables summarize the indicators by `property`s that actually do an
 | 18 | Armed Away. But silent. |
 | 4 | Burglar alarm. Plays alarm, flashes light until another mode is selected.  Does not respect duration (property_key 7). |
 | 5 | Keypad says "Sensors require bypass." Enter button blinks. |
-| 5 | Same as 5, but silent. |
+| 22 | Same as 5, but silent. |
 | 20 | Medical alarm. Medical button lights, bar flashes.  No alarm sound plays. Does not respect duration (property_key 7). |
 
-### Delays (use `property_key` 7 to specify length in seconds)
-
+### Delays (there's no way to set the duration of the delays manually so we're stuck with 15, 30 or 45 seconds)
 | `property` | Description |
 | ---------- | ----------- |
-| 22 | Entry delay.  Keypad says "Entry delay started." Plays sound, speeding up near end of specified duration.  Bar shows countdown. |
-| 23 | Exit delay.  Keypad says "Exit delay started." Plays sound, speeding up near end of specified duration.  Bar shows countup. |
+| 22 | Entry delay of 15 seconds. Plays sound, speeding up near the end.  Ring shows countdown. |
+| 38 | Entry delay of 30 seconds. Plays sound, speeding up near the end.  Ring shows countdown. |
+| 54 | Entry delay of 45 seconds. Plays sound, speeding up near the end.  Ring shows countdown. |
+| 23 | Exit delay of 15 seconds. Plays sound, speeding up near the end.  Ring shows countup. |
+| 39 | Exit delay of 15 seconds. Plays sound, speeding up near the end.  Ring shows countup. |
+| 55 | Exit delay of 45 seconds. Plays sound, speeding up near the end.  Ring shows countup. |
 
 ### Sounds
 
@@ -138,6 +124,6 @@ The following tables summarize the indicators by `property`s that actually do an
 
 [![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FImSorryButWho%2FHomeAssistantNotes%2Fblob%2Fmain%2Fkeypad_blueprint.yaml)
 
-I've created a [blueprint](https://github.com/ImSorryButWho/HomeAssistantNotes/blob/main/keypad_blueprint.yaml) that will create an automation which handles all the basic interactions between an `alarm_control_panel` instance and the Ring Keypad v2.  Pair the keypad following the instructions above, and configure an Alarmo instance in your Home Assistant.  Then, you can install the Blueprint above and create the automation, giving it the device for the keypad, the entity_id for the alarm instance, as well as the Z-Wave Node ID for the keypad (necessary to identify the events of interest), and the entry and exit delay times for the alarm.
+I've created a [blueprint](https://github.com/ImSorryButWho/HomeAssistantNotes/blob/main/keypad_blueprint.yaml) that will create an automation which handles all the basic interactions between an `alarm_control_panel` instance and the Ring Keypad v1.  Pair the keypad following the instructions above, and configure an Alarmo instance in your Home Assistant.  Then, you can install the Blueprint above and create the automation, giving it the device for the keypad, the entity_id for the alarm instance, as well as the Z-Wave Node ID for the keypad (necessary to identify the events of interest), and the entry and exit delay times for the alarm.
 
 Please feel free to send pull requests for improvements.  This is my first Blueprint.
