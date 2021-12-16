@@ -106,7 +106,7 @@ The following tables summarize the indicators by `property`s that actually do an
 | 38 | Entry delay of 30 seconds. Plays sound, speeding up near the end.  Ring shows countdown. |
 | 54 | Entry delay of 45 seconds. Plays sound, speeding up near the end.  Ring shows countdown. |
 | 23 | Exit delay of 15 seconds. Plays sound, speeding up near the end.  Ring shows countup. |
-| 39 | Exit delay of 15 seconds. Plays sound, speeding up near the end.  Ring shows countup. |
+| 39 | Exit delay of 30 seconds. Plays sound, speeding up near the end.  Ring shows countup. |
 | 55 | Exit delay of 45 seconds. Plays sound, speeding up near the end.  Ring shows countup. |
 
 ### Sounds
