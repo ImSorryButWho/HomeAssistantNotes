@@ -163,7 +163,7 @@ action:
             endpoint: "0"
             property: "9"
             property_key: "1"
-            value: 1
+            value: 100
     - conditions:
         - condition: trigger
           id: need_bypass
@@ -176,7 +176,7 @@ action:
             endpoint: "0"
             property: "16"
             property_key: "1"
-            value: 1
+            value: 100
     - conditions:
         - condition: trigger
           id: alarm_disarmed
@@ -189,7 +189,7 @@ action:
             endpoint: "0"
             property: "2"
             property_key: "1"
-            value: 1
+            value: 100
     - conditions:
         - condition: trigger
           id: alarm_armed_away
@@ -202,7 +202,7 @@ action:
             endpoint: "0"
             property: "11"
             property_key: "1"
-            value: 1
+            value: 100
     - conditions:
         - condition: trigger
           id: alarm_armed_home
@@ -215,7 +215,7 @@ action:
             endpoint: "0"
             property: "10"
             property_key: "1"
-            value: 1
+            value: 100
     - conditions:
         - condition: trigger
           id: alarm_arming
@@ -254,4 +254,4 @@ action:
             endpoint: "0"
             property: "13"
             property_key: "1"
-            value: 1
+            value: 100
