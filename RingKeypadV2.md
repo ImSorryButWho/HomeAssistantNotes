@@ -97,7 +97,7 @@ For example, to set the keypad to disarmed mode, we can run the following comman
       property_key: '1'
       value: 1
       
-You can use any `entity_id` associated with the keypad, or find the device id and use that.  `command_class` will always be 135 (the indicator command class), and `endpoint` will always be 0.  For most messages, I find it makes sense to use a `property_key` of 1 and `value` of 1, just indicating that the indicator should be turned on (meaning that we're playing a message or changing the mode of the keypad).  For indicators where a time make sense (e.g. entry delay, exit delay or alarms), use `property_key` 7 and a value of the number of seconds you want it to last.
+You can use any `entity_id` associated with the keypad, or find the device id and use that.  `command_class` will always be 135 (the indicator command class), and `endpoint` will always be 0.  For most messages, I find it makes sense to use a `property_key` of 1 and `value` of 1, just indicating that the indicator should be turned on (meaning that we're playing a message or changing the mode of the keypad).  For modes, use a `property_key` of 1 and `value` of 100.  For these, the value sets the brightness of the appropriate mode button while changing modes, in a range of 0-100.  For indicators where a time make sense (e.g. entry delay, exit delay or alarms), use `property_key` 7 and a value of the number of seconds you want it to last.
 
 The following tables summarize the indicators by `property`s that actually do anything that I can find.
 
@@ -105,10 +105,10 @@ The following tables summarize the indicators by `property`s that actually do an
 
 | `property` | Description |
 | ---------- | ----------- |
-| 2 | Disarmed.  Keypad says "Disarmed," disarmed light lights up on motion. |
+| 2 | Disarmed.  Keypad says "Disarmed," disarmed light lights up on motion. Value is the brightness of the disarmed light while switching modes.|
 | 9 | Code not accepted.  A soft error tone plays. |
-| 10 | Armed Stay.  Keypad says "Home and armed," armed stay light lights up on motion. |
-| 11 | Armed Away.  Keypad says "Away and armed," armed away light lights up on motion. |
+| 10 | Armed Stay.  Keypad says "Home and armed," armed stay light lights up on motion. Value is the brightness of the armed stay light while switching modes.|
+| 11 | Armed Away.  Keypad says "Away and armed," armed away light lights up on motion. Value is the brightness of the armed away light while switching modes.|
 | 12 | Generic alarm.  Plays alarm, flashes light until another mode is selected.  Does not respect duration (property_key 7). |
 | 13 | Burglar alarm.  Identical to 12. |
 | 14 | Smoke alarm.  Plays smoke alarm, flashes light until another mode is selected.  Does not respect duration (property_key 7). |
