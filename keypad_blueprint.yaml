@@ -17,8 +17,27 @@ blueprint:
         entity:
           domain: alarm_control_panel
           integration: alarmo
+    selected_action_police:
+      name: Selected Action Police
+      description: Select the action for Police Button
+      default: []
+      selector:
+        action:
+    selected_action_fire:
+      name: Selected Action Fire
+      description: Select the action for Fire Button
+      default: []
+      selector:
+        action:
+    selected_action_medical:
+      name: Selected Action Medical
+      description: Select the action for Medical Button
+      default: []
+      selector:
+        action:
 variables:
   alarm: !input alarm
+  pincode: ''
 mode: parallel
 max: 10
 trigger:
@@ -50,6 +69,27 @@ trigger:
       device_id: !input keypad
       event_type: 6
     id: keypad_arm_home
+  - platform: event
+    event_type: zwave_js_notification
+    event_data:
+      command_class: 111
+      device_id: !input 'keypad'
+      event_type: 16
+    id: keypad_fire
+  - platform: event
+    event_type: zwave_js_notification
+    event_data:
+      command_class: 111
+      device_id: !input 'keypad'
+      event_type: 17
+    id: keypad_police
+  - platform: event
+    event_type: zwave_js_notification
+    event_data:
+      command_class: 111
+      device_id: !input 'keypad'
+      event_type: 19
+    id: keypad_medical
   - platform: event
     event_type: "alarmo_failed_to_arm"
     event_data:
@@ -117,11 +157,15 @@ action:
                 condition: template
                 value_template: "{{ trigger.event.data.event_data is not none }}"
               sequence:
+                # create pincode variable
+                - variables:
+                    pincode: "{{ trigger.event.data.event_data }}"
                 - service: alarm_control_panel.alarm_arm_away
                   target:
                     entity_id: !input alarm
                   data:
-                    code: "{{ trigger.event.data.event_data }}"
+                    code: "{{ pincode }}"
+
           default:
             - service: alarm_control_panel.alarm_arm_away
               target:
@@ -141,11 +185,15 @@ action:
                 condition: template
                 value_template: "{{ trigger.event.data.event_data is not none }}"
               sequence:
+                # create pincode variable
+                - variables:
+                    pincode: "{{ trigger.event.data.event_data }}"
                 - service: alarm_control_panel.alarm_arm_home
                   target:
                     entity_id: !input alarm
                   data:
-                    code: "{{ trigger.event.data.event_data }}"
+                    code: "{{ pincode }}"
+
           default:
             - service: alarm_control_panel.alarm_arm_home
               target:
@@ -177,6 +225,47 @@ action:
             property: "16"
             property_key: "1"
             value: 100
+        - wait_for_trigger:
+            - platform: event
+              event_type: "zwave_js_notification"
+              event_data:
+                command_class: 111
+                device_id: !input keypad
+                event_type: 2
+          timeout: "5"
+          continue_on_timeout: false
+        - choose:
+            - conditions:
+                - condition: state
+                  entity_id: alarm_control_panel.alarmo
+                  state: armed_home
+                  attribute: arm_mode
+              sequence:
+                - service: alarmo.arm
+                  data:
+                    entity_id: alarm_control_panel.alarmo
+                    mode: home
+                    force: true
+                    code: "{{ pincode }}"
+                # destroy pincode variable
+                # - variables:
+                #     pincode: ''
+            - conditions:
+                - condition: state
+                  entity_id: alarm_control_panel.alarmo
+                  state: armed_away
+                  attribute: arm_mode
+              sequence:
+                - service: alarmo.arm
+                  data:
+                    entity_id: alarm_control_panel.alarmo
+                    mode: away
+                    force: true
+                    code: "{{ pincode }}"
+                # destroy pincode variable
+                # - variables:
+                #     pincode: ''
+          default: []
     - conditions:
         - condition: trigger
           id: alarm_disarmed
@@ -255,3 +344,15 @@ action:
             property: "13"
             property_key: "1"
             value: 100
+    - conditions:
+      - condition: trigger
+        id: keypad_fire
+      sequence: !input selected_action_fire
+    - conditions:
+      - condition: trigger
+        id: keypad_police
+      sequence: !input selected_action_police
+    - conditions:
+      - condition: trigger
+        id: keypad_medical
+      sequence: !input selected_action_medical
