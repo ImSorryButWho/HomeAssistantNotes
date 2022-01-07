@@ -17,6 +17,24 @@ blueprint:
         entity:
           domain: alarm_control_panel
           integration: alarmo
+    selected_action_police:
+      name: Selected Action Police
+      description: Select the action for Police Button
+      default: []
+      selector:
+        action:
+    selected_action_fire:
+      name: Selected Action Fire
+      description: Select the action for Fire Button
+      default: []
+      selector:
+        action:
+    selected_action_medical:
+      name: Selected Action Medical
+      description: Select the action for Medical Button
+      default: []
+      selector:
+        action:
 variables:
   alarm: !input alarm
 mode: parallel
@@ -50,6 +68,27 @@ trigger:
       device_id: !input keypad
       event_type: 6
     id: keypad_arm_home
+  - platform: event
+    event_type: zwave_js_notification
+    event_data:
+      command_class: 111
+      device_id: !input 'keypad'
+      event_type: 16
+    id: keypad_fire
+  - platform: event
+    event_type: zwave_js_notification
+    event_data:
+      command_class: 111
+      device_id: !input 'keypad'
+      event_type: 17
+    id: keypad_police
+  - platform: event
+    event_type: zwave_js_notification
+    event_data:
+      command_class: 111
+      device_id: !input 'keypad'
+      event_type: 19
+    id: keypad_medical
   - platform: event
     event_type: "alarmo_failed_to_arm"
     event_data:
@@ -255,3 +294,15 @@ action:
             property: "13"
             property_key: "1"
             value: 100
+    - conditions:
+      - condition: trigger
+        id: keypad_fire
+      sequence: !input selected_action_fire
+    - conditions:
+      - condition: trigger
+        id: keypad_police
+      sequence: !input selected_action_police
+    - conditions:
+      - condition: trigger
+        id: keypad_medical
+      sequence: !input selected_action_medical
