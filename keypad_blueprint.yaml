@@ -17,6 +17,12 @@ blueprint:
         entity:
           domain: alarm_control_panel
           integration: alarmo
+    pincode:
+      name: Temporary Variable for Pincode
+      description: The pincode has to be temporarily stored to be able to reuse it for bypass validation. You first need to setup a text_input helper in HA and select it here. Set the display mode to password to hide the password.
+      selector:
+        entity:
+            domain: input_text
     selected_action_police:
       name: Selected Action Police
       description: Select the action for Police Button
@@ -37,6 +43,7 @@ blueprint:
         action:
 variables:
   alarm: !input alarm
+  _pincode: !input pincode
 mode: parallel
 max: 10
 trigger:
@@ -161,6 +168,11 @@ action:
                     entity_id: !input alarm
                   data:
                     code: "{{ trigger.event.data.event_data }}"
+                - service: input_text.set_value
+                  target:
+                    entity_id: !input pincode
+                  data:
+                    value: "{{ trigger.event.data.event_data }}"
           default:
             - service: alarm_control_panel.alarm_arm_away
               target:
@@ -185,6 +197,11 @@ action:
                     entity_id: !input alarm
                   data:
                     code: "{{ trigger.event.data.event_data }}"
+                - service: input_text.set_value
+                  target:
+                    entity_id: !input pincode
+                  data:
+                    value: "{{ trigger.event.data.event_data }}"
           default:
             - service: alarm_control_panel.alarm_arm_home
               target:
@@ -216,6 +233,46 @@ action:
             property: "16"
             property_key: "1"
             value: 100
+        - wait_for_trigger:
+            - platform: event
+              event_type: "zwave_js_notification"
+              event_data:
+                command_class: 111
+                device_id: !input keypad
+                event_type: 2
+          timeout: "5"
+          continue_on_timeout: false
+        - choose:
+            - conditions:
+                - condition: state
+                  entity_id: alarm_control_panel.alarmo
+                  state: armed_home
+                  attribute: arm_mode
+              sequence:
+                - service: alarmo.arm
+                  data:
+                    entity_id: alarm_control_panel.alarmo
+                    mode: home
+                    force: true
+                    code: "{{ states(_pincode) }}"
+            - conditions:
+                - condition: state
+                  entity_id: alarm_control_panel.alarmo
+                  state: armed_away
+                  attribute: arm_mode
+              sequence:
+                - service: alarmo.arm
+                  data:
+                    entity_id: alarm_control_panel.alarmo
+                    mode: away
+                    force: true
+                    code: "{{ states(_pincode) }}"
+          default: []
+        - service: input_text.set_value
+          target:
+            entity_id: !input pincode
+          data:
+            value: ""
     - conditions:
         - condition: trigger
           id: alarm_disarmed
