@@ -161,7 +161,6 @@ action:
                     entity_id: !input alarm
                   data:
                     code: "{{ trigger.event.data.event_data }}"
-
           default:
             - service: alarm_control_panel.alarm_arm_away
               target:
@@ -186,7 +185,6 @@ action:
                     entity_id: !input alarm
                   data:
                     code: "{{ trigger.event.data.event_data }}"
-
           default:
             - service: alarm_control_panel.alarm_arm_home
               target:
