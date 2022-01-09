@@ -17,12 +17,6 @@ blueprint:
         entity:
           domain: alarm_control_panel
           integration: alarmo
-    pincode:
-      name: Temporary Variable for Pincode
-      description: The pincode has to be temporarily stored to be able to reuse it for bypass validation. You first need to setup a text_input helper in HA and select it here. Set the display mode to password to hide the password.
-      selector:
-        entity:
-            domain: input_text
     selected_action_police:
       name: Selected Action Police
       description: Select the action for Police Button
@@ -43,7 +37,6 @@ blueprint:
         action:
 variables:
   alarm: !input alarm
-  _pincode: !input pincode
 mode: parallel
 max: 10
 trigger:
@@ -143,69 +136,54 @@ action:
             - code_entered
             - keypad_disarm
       sequence:
-        - service: alarm_control_panel.alarm_disarm
-          entity_id: !input alarm
+        - service: alarmo.disarm
           data:
-            code: "{{ trigger.event.data.event_data }}"
+            entity_id: !input alarm
+            code: >
+              {% if trigger.event.data.event_data != none %}
+                {{ trigger.event.data.event_data }}
+              {% endif %}
     - conditions:
         - condition: and
           conditions:
-            - condition: trigger
-              id: keypad_arm_away
+            - condition: or
+              conditions:
+                - condition: trigger
+                  id: keypad_arm_away
+                - condition: trigger
+                  id: keypad_arm_home
             - condition: state
-              entity_id: !input alarm
-              state:
-                - "disarmed"
-                - "armed_home"
+              entity_id: alarm_control_panel.alarmo
+              state: disarmed
       sequence:
-        - choose:
-            - conditions:
-                condition: template
-                value_template: "{{ trigger.event.data.event_data is not none }}"
-              sequence:
-                - service: alarm_control_panel.alarm_arm_away
-                  target:
-                    entity_id: !input alarm
-                  data:
-                    code: "{{ trigger.event.data.event_data }}"
-                - service: input_text.set_value
-                  target:
-                    entity_id: !input pincode
-                  data:
-                    value: "{{ trigger.event.data.event_data }}"
-          default:
-            - service: alarm_control_panel.alarm_arm_away
-              target:
-                entity_id: !input alarm
-    - conditions:
-        - condition: and
-          conditions:
-            - condition: trigger
-              id: keypad_arm_home
-            - condition: state
-              entity_id: !input alarm
-              state:
-                - "disarmed"
-      sequence:
-        - choose:
-            - conditions:
-                condition: template
-                value_template: "{{ trigger.event.data.event_data is not none }}"
-              sequence:
-                - service: alarm_control_panel.alarm_arm_home
-                  target:
-                    entity_id: !input alarm
-                  data:
-                    code: "{{ trigger.event.data.event_data }}"
-                - service: input_text.set_value
-                  target:
-                    entity_id: !input pincode
-                  data:
-                    value: "{{ trigger.event.data.event_data }}"
-          default:
-            - service: alarm_control_panel.alarm_arm_home
-              target:
-                entity_id: !input alarm
+        - service: alarmo.arm
+          data:
+            entity_id: !input alarm
+            mode: '{{ trigger.id.split("_")[2] }}'
+            force: false
+            code: >
+              {% if trigger.event.data.event_data != none %}
+                {{ trigger.event.data.event_data }}
+              {% endif %}
+        - wait_for_trigger:
+            - platform: event
+              event_type: zwave_js_notification
+              event_data:
+                command_class: 111
+                device_id: !input keypad
+                event_type: 2
+                event_data: null
+          timeout: '5'
+          continue_on_timeout: false
+        - service: alarmo.arm
+          data:
+            entity_id: !input alarm
+            mode: '{{ trigger.id.split("_")[2] }}'
+            force: true
+            code: >
+              {% if trigger.event.data.event_data != none %}
+                {{ trigger.event.data.event_data }}
+              {% endif %}
     - conditions:
         - condition: trigger
           id:
@@ -233,46 +211,6 @@ action:
             property: "16"
             property_key: "1"
             value: 100
-        - wait_for_trigger:
-            - platform: event
-              event_type: "zwave_js_notification"
-              event_data:
-                command_class: 111
-                device_id: !input keypad
-                event_type: 2
-          timeout: "5"
-          continue_on_timeout: false
-        - choose:
-            - conditions:
-                - condition: state
-                  entity_id: alarm_control_panel.alarmo
-                  state: armed_home
-                  attribute: arm_mode
-              sequence:
-                - service: alarmo.arm
-                  data:
-                    entity_id: alarm_control_panel.alarmo
-                    mode: home
-                    force: true
-                    code: "{{ states(_pincode) }}"
-            - conditions:
-                - condition: state
-                  entity_id: alarm_control_panel.alarmo
-                  state: armed_away
-                  attribute: arm_mode
-              sequence:
-                - service: alarmo.arm
-                  data:
-                    entity_id: alarm_control_panel.alarmo
-                    mode: away
-                    force: true
-                    code: "{{ states(_pincode) }}"
-          default: []
-        - service: input_text.set_value
-          target:
-            entity_id: !input pincode
-          data:
-            value: ""
     - conditions:
         - condition: trigger
           id: alarm_disarmed
