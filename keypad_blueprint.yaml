@@ -153,7 +153,7 @@ action:
                 - condition: trigger
                   id: keypad_arm_home
             - condition: state
-              entity_id: alarm_control_panel.alarmo
+              entity_id: !input alarm
               state: disarmed
       sequence:
         - service: alarmo.arm
