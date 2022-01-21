@@ -97,7 +97,7 @@ For example, to set the keypad to disarmed mode, we can run the following comman
       property_key: '1'
       value: 1
       
-You can use any `entity_id` associated with the keypad, or find the device id and use that.  `command_class` will always be 135 (the indicator command class), and `endpoint` will always be 0.  For most messages, I find it makes sense to use a `property_key` of 1 and `value` of 1, just indicating that the indicator should be turned on (meaning that we're playing a message or changing the mode of the keypad).  For modes, use a `property_key` of 1 and `value` of 100.  For these, the value sets the brightness of the appropriate mode button while changing modes, in a range of 0-100.  For indicators where a time make sense (e.g. entry delay, exit delay or alarms), use `property_key` 7 and a value of the number of seconds you want it to last.
+You can use any `entity_id` associated with the keypad, or find the device id and use that.  `command_class` will always be 135 (the indicator command class), and `endpoint` will always be 0.  For most messages, I find it makes sense to use a `property_key` of 1 and `value` of 1, just indicating that the indicator should be turned on (meaning that we're playing a message or changing the mode of the keypad).  For modes, use a `property_key` of 1 and `value` of 100.  For these, the value sets the brightness of the appropriate mode button while changing modes, in a range of 0-100.  For indicators where a time make sense (e.g. entry delay, exit delay or alarms), use `property_key` 7 and a value of the number of seconds you want it to last.  For generic sound indicators, use `property_key` 9 to set the volume of the sound (in a range of 0-100).
 
 The following tables summarize the indicators by `property`s that actually do anything that I can find.
 
@@ -122,6 +122,16 @@ The following tables summarize the indicators by `property`s that actually do an
 | ---------- | ----------- |
 | 17 | Entry delay.  Keypad says "Entry delay started." Plays sound, speeding up near end of specified duration.  Bar shows countdown. |
 | 18 | Exit delay.  Keypad says "Exit delay started." Plays sound, speeding up near end of specified duration.  Bar shows countup. |
+
+### Notification Sounds (use `property_key` 9 to specify volume)
+
+|`property` | Description |
+| --------- | ----------- |
+| 96 | Electronic double beep |
+| 97 | Guitar riff |
+| 98 | Wind chimes |
+| 99 | Echoey Bing Bong |
+| 100 | Ring doorbell chime |
 
 ## Automation Blueprint
 
