@@ -8,17 +8,17 @@ In this document, I'll talk about how to use the Ring keypad with Home Assistant
 
 ## Pairing
 
-As of this writing, ZWaveJS2MQTT is the only method I can find to successfully pair the keypad with Home Assistant with full functionality.  I assume the standard ZWaveJS implementation will gain support for S2 security eventually, but currently (October 2021) the UI doesn't support it.
+As of this writing, S2 security is supported by both the standard ZWaveJS or ZWaveJS2MQTT add-ons.  It is *not* supported by the legacy Z-Wave integration.
 
-So, to make this work, be sure you're using ZWaveJS2MQTT.  The easiest way to do that is via the [community add-on](https://github.com/hassio-addons/addon-zwavejs2mqtt), which is part of the default add-on store.  Migrating from the standard ZWaveJS add-on to ZWaveJS2MQTT is out of the scope of this document, but should be straightforward.
+If you haven't set up any devices with S2 security before, you likely don't have S2 keys defined.  In the ZWaveJS2MQTT settings page ZWave area, click the two arrows button next to the three S2 keys to generate new ones.   (Of course, don't do this if you already have keys defined, or you'll lose the ability to control whatever devices you already have paired!)  If you're using the standard ZWaveJS integration, keys were automatically generated for you.
 
-If you haven't set up any devices with S2 security before, you likely don't have S2 keys defined.  In the ZWaveJS2MQTT settings page ZWave area, click the two arrows button next to the three S2 keys to generate new ones.  (Of course, don't do this if you already have keys defined, or you'll lose the ability to control whatever devices you already have paired!)
+There's one issue I've had with this keypad: the security negotiation seems to time out quickly.  Smart Start is the easiest way to avoid this problem.  In ZWaveJS2MQTT, go to the Smart Start tab and add the device by pressing the "+" button in the bottom-right corner, then scanning the QR code.  Or, in Home Assistant, follow the ZWave add device flow and select the Smart Start option, and scan the QR code.
 
-There's one issue I've had with this keypad: the security negotiation seems to time out quickly.  I found I need to have the DSK PIN (from the QR code on the back of the keypad) entered within a couple of seconds, or security negotiation fails.  I'd strongly suggest you type the PIN into a text document and copy it to your clipboard, ready to paste in as soon as ZWaveJS2MQTT asks for it.
+Now you're ready to pair.  Plug the keypad into a power outlet (it will not pair on batteries).  Theoretically, it should automatically pair with the controller in a few seconds, and you should see a notification that it paired with S2 security.
 
-Now you're ready to pair.  Plug the keypad into a power outlet (it will not pair on batteries).  Start inclusion by clicking "Manage Nodes" on the main ZWaveJS2MQTT page, then selecting Default mode.  Once inclusion mode starts, hold down the 1 key on the keypad until the green indicator starts flashing.
+If you don't see it included, you can start inclusion by clicking "Manage Nodes" on the main ZWaveJS2MQTT page, then selecting Default mode.  Once inclusion mode starts, hold down the 1 key on the keypad until the green indicator starts flashing.  Walk through the rest of the setup procss.
 
-Eventually, a security choice pop-up will appear.  Click next quickly, and the DSK prompt will appear.  Paste in the PIN you copied earlier and click next quickly.  In a few seconds, you should see confirmation that it was paired with S2 Access Control.  If not, you'll need to try again.
+In a few seconds, you should see confirmation that it was paired with S2 Access Control.  If not, you'll need to try again.
 
 If it failed, go to Manage Nodes -> Exclusion, and while you're in exclusion mode insert the reset pin that was included in the box in the hole on the back of the keypad.  Try the inclusion process again.  It took me a few tries to get it paired, but I eventually succeeded.
 
