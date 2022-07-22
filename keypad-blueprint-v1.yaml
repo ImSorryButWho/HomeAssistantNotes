@@ -225,7 +225,7 @@ action:
             command_class: "135"
             endpoint: "0"
             property: "value"
-                          '{{ 23 if state_attr(alarm, ''delay'') == 15 else 39 if state_attr(alarm,''delay'') == 30 else 55 if state_attr(alarm, ''delay'') == 45 else 71 if state_attr(alarm, "delay") == 60 else 8 }}'
+            value: "{{ 23 if state_attr(alarm, 'delay') == 15 else 39 if state_attr(alarm,'delay') == 30 else 55 if state_attr(alarm, 'delay') == 45 else 71 if state_attr(alarm, 'delay') == 60 else 8 }}"
     - conditions:
         - condition: trigger
           id: alarm_pending
@@ -237,7 +237,7 @@ action:
             command_class: "135"
             endpoint: "0"
             property: "value"
-              '{{ 22 if state_attr(alarm, ''delay'') == 15 else 38 if state_attr(alarm,''delay'') == 30 else 54 if state_attr(alarm, ''delay'') == 45  else 70 if state_attr(alarm, "delay") == 60 else 8 }}'
+            value: "{{ 22 if state_attr(alarm, 'delay') == 15 else 38 if state_attr(alarm,'delay') == 30 else 54 if state_attr(alarm, 'delay') == 45  else 70 if state_attr(alarm, 'delay') == 60 else 8 }}"
     - conditions:
         - condition: trigger
           id: alarm_triggered
