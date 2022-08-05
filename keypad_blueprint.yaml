@@ -267,6 +267,8 @@ action:
         - condition: trigger
           id: alarm_pending
       sequence:
+        - delay:
+            milliseconds: 500
         - service: zwave_js.set_value
           target:
             device_id: !input keypad
