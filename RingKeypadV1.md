@@ -90,6 +90,7 @@ The following tables summarize the indicators by `property`s that actually do an
 | 3 | Disarmed. Keypad says "Disarmed," disarmed light lights up on motion. |
 | 19 | Disarmed. But silent. |
 | 8 | Code not accepted.  A soft error tone plays. |
+| 24 | Same as 8, but no tone (Basically three red blinks) |
 | 1 | Armed Stay. Keypad says "Home and armed," armed stay light lights up on motion. |
 | 17 | Armed Stay. But silent. |
 | 2 | Armed Away. Keypad says "Away and armed," armed away light lights up on motion. |
