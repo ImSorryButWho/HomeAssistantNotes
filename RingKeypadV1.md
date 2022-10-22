@@ -43,7 +43,8 @@ This event was generated from entering the code "1234", and pressing the Enter b
 | 2 | Enter |
 | 3 | Disarm |
 | 5 | Arm Away |
-| 6 | Arm Stay |]
+| 6 | Arm Stay |
+| 18 | Panic Mode (Holding Cancel and Enter for at least 3 seconds) |
 | 25 | Cancel |
 
 To use this, you'll want to create some Home Assistant automations like:
@@ -90,14 +91,15 @@ The following tables summarize the indicators by `property`s that actually do an
 | 3 | Disarmed. Keypad says "Disarmed," disarmed light lights up on motion. |
 | 19 | Disarmed. But silent. |
 | 8 | Code not accepted.  A soft error tone plays. |
+| 24 | Same as 8, but no tone (Basically three red blinks) |
 | 1 | Armed Stay. Keypad says "Home and armed," armed stay light lights up on motion. |
 | 17 | Armed Stay. But silent. |
 | 2 | Armed Away. Keypad says "Away and armed," armed away light lights up on motion. |
 | 18 | Armed Away. But silent. |
-| 4 | Burglar alarm. Plays alarm, flashes light until another mode is selected.  Does not respect duration (property_key 7). |
+| 4 | Burglar alarm. Plays alarm, flashes light until another mode is selected. Runs until another status is set. |
 | 5 | Keypad says "Sensors require bypass." Enter button blinks. |
-| 22 | Same as 5, but silent. |
-| 20 | Medical alarm. Medical button lights, bar flashes.  No alarm sound plays. Does not respect duration (property_key 7). |
+| 21 | Same as 5, but silent. |
+| 20 | Medical alarm. Plays a specific repeating beep sound and flashes the notification ring red. Runs until another status is set. |
 
 ### Delays (there's no way to set the duration of the delays manually so we're stuck with 15, 30 or 45 seconds)
 | `property` | Description |
