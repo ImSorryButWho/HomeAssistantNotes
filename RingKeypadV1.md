@@ -43,7 +43,8 @@ This event was generated from entering the code "1234", and pressing the Enter b
 | 2 | Enter |
 | 3 | Disarm |
 | 5 | Arm Away |
-| 6 | Arm Stay |]
+| 6 | Arm Stay |
+| 18 | Panic Mode (Holding Cancel and Enter for at least 3 seconds) |
 | 25 | Cancel |
 
 To use this, you'll want to create some Home Assistant automations like:
