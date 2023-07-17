@@ -1,6 +1,6 @@
 blueprint:
-  name: Ring Keypad V1 Automations
-  description: Automations to use the Ring Keypad V1 with an Alarm Panel integration.  See https://github.com/ImSorryButWho/HomeAssistantNotes/blob/main/RingKeypadV1.md for more information.
+  name: Ring Keypad Gen1 Automations
+  description: Automations to use the Ring Keypad Gen1 with an Alarmo Alarm Panel integration.  See https://github.com/ImSorryButWho/HomeAssistantNotes/blob/main/RingKeypadV1.md for more information.
   domain: automation
   input:
     keypad:
@@ -51,6 +51,13 @@ trigger:
       event_type: 6
     id: keypad_arm_home
   - platform: event
+    event_type: "zwave_js_notification"
+    event_data:
+      command_class: 111
+      device_id: !input keypad
+      event_type: 18
+    id: keypad_panic_alarm
+  - platform: event
     event_type: "alarmo_failed_to_arm"
     event_data:
       reason: "invalid_code"
@@ -94,7 +101,7 @@ action:
     - conditions:
         - condition: trigger
           id:
-            - code_entered
+            - code_entered #This is an assumed behavior, making the enter button try to disarm the system. Differs from native Ring, but makes sense.
             - keypad_disarm
       sequence:
         - service: alarm_control_panel.alarm_disarm
@@ -111,6 +118,7 @@ action:
               state:
                 - "disarmed"
                 - "armed_home"
+                - "arming" #This is currently unsupported by Alarmo, but should still be implemented!
       sequence:
         - choose:
             - conditions:
@@ -135,6 +143,8 @@ action:
               entity_id: !input alarm
               state:
                 - "disarmed"
+                - "armed_away"
+                - "arming" #This is currently unsupported by Alarmo, but should still be implemented!
       sequence:
         - choose:
             - conditions:
@@ -225,7 +235,7 @@ action:
             command_class: "135"
             endpoint: "0"
             property: "value"
-            value: "{{ 23 if state_attr(alarm, 'delay') == 15 else 39 if state_attr(alarm,'delay') == 30 else 55 if state_attr(alarm, 'delay') == 45 else 71 if state_attr(alarm, 'delay') == 60 else 8 }}"
+            value: "{{ 23 if state_attr(alarm, 'delay') <= 15 else 39 if state_attr(alarm,'delay') <= 30 else 55 if state_attr(alarm, 'delay') <= 45 else 71 if state_attr(alarm, 'delay') <= 60 else 8 }}"
     - conditions:
         - condition: trigger
           id: alarm_pending
@@ -237,7 +247,7 @@ action:
             command_class: "135"
             endpoint: "0"
             property: "value"
-            value: "{{ 22 if state_attr(alarm, 'delay') == 15 else 38 if state_attr(alarm,'delay') == 30 else 54 if state_attr(alarm, 'delay') == 45  else 70 if state_attr(alarm, 'delay') == 60 else 8 }}"
+            value: "{{ 22 if state_attr(alarm, 'delay') <= 15 else 38 if state_attr(alarm,'delay') <= 30 else 54 if state_attr(alarm, 'delay') <= 45  else 70 if state_attr(alarm, 'delay') <= 60 else 8 }}"
     - conditions:
         - condition: trigger
           id: alarm_triggered
@@ -250,3 +260,11 @@ action:
             endpoint: "0"
             property: "value"
             value: 4
+    - conditions:
+        - condition: trigger
+          id: keypad_panic_alarm
+      sequence:
+        - service: alarm_control_panel.alarm_trigger
+          target:
+            entity_id: !input alarm
+          data: {}
