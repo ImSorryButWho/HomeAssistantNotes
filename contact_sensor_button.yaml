@@ -1,0 +1,32 @@
+blueprint:
+  name: Ring Contact Sensor Button
+  description: React to pressing the button on a Ring contact sesnor
+  domain: automation
+  input:
+    sensor:
+      name: Ring Contact Sensor
+      description: The device entry for the Ring contact sensor
+      selector:
+        device:
+          manufacturer: Ring
+          integration: zwave_js
+          multiple: false
+    selected_action:
+      name: Selected Action
+      description: Select the action for Button Press
+      default: []
+      selector:
+        action: {}
+trigger:
+  - platform: event
+    event_type: zwave_js_notification
+    event_data:
+      command_class: 113
+      device_id: !input sensor
+      type: 9
+      event: 5
+    id: button_pressed
+action:
+  - alias: "Run the action"
+    choose: []
+    default: !input selected_action
