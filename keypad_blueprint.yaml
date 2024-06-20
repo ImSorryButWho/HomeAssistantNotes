@@ -39,6 +39,8 @@ variables:
   alarm: !input alarm
 mode: parallel
 max: 10
+trace:
+  stored_traces: 0
 trigger:
   - platform: event
     event_type: "zwave_js_notification"
