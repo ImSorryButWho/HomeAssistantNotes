@@ -118,7 +118,7 @@ action:
               state:
                 - "disarmed"
                 - "armed_home"
-                - "arming" #This is currently unsupported by Alarmo, but should still be implemented!
+                - "arming"
       sequence:
         - choose:
             - conditions:
@@ -144,7 +144,7 @@ action:
               state:
                 - "disarmed"
                 - "armed_away"
-                - "arming" #This is currently unsupported by Alarmo, but should still be implemented!
+                - "arming"
       sequence:
         - choose:
             - conditions:
