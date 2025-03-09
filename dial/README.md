@@ -15,4 +15,4 @@ In this directory, you'll find the ESPHome config file, as well as the Home Assi
   - `input_text.next_track`
   - `input_text.next_next_track`
 
-Physically, I took a [tiny picture frame](https://www.michaels.com/product/black-mini-frame-with-burlap-mat-by-studio-decor-10286954), removed the glass and replaced it with a piece of foam core with a hole cut to the right size to mount the dial, and covered in some [patterned vinyl](https://www.michaels.com/product/siser-sparkleberry-easypsv-permanent-mermaid-scales-10637822).  I'd like to find a nicer way to hide the cord, but overall I think it really nice.
+Physically, I took a [tiny picture frame](https://www.michaels.com/product/black-mini-frame-with-burlap-mat-by-studio-decor-10286954), removed the glass and replaced it with a piece of foam core with a hole cut to the right size to mount the dial, and covered in some [patterned vinyl](https://www.michaels.com/product/siser-sparkleberry-easypsv-permanent-mermaid-scales-10637822).  I'd like to find a nicer way to hide the cord, but overall I think it came out really nice.
