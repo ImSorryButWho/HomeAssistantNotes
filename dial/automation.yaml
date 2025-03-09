@@ -1,0 +1,94 @@
+alias: Fetch track names
+description: ""
+triggers:
+  - trigger: state
+    entity_id:
+      - media_player.bathroom
+    attribute: queue_position
+  - trigger: state
+    entity_id:
+      - media_player.bathroom
+    attribute: queue_size
+  - trigger: state
+    entity_id:
+      - media_player.bathroom
+    to: playing
+conditions: []
+actions:
+  - action: sonos.get_queue
+    metadata: {}
+    data: {}
+    response_variable: queue
+    target:
+      entity_id: media_player.bathroom
+  - action: input_text.set_value
+    metadata: {}
+    data:
+      value: >-
+        {% set queue_length = queue["media_player.bathroom"] | length %} {% set
+        title =
+        queue["media_player.bathroom"][(state_attr("media_player.bathroom","queue_position")
+        + queue_length - 3) % queue_length]["media_title"] %} {% if title |
+        length > 16 %}
+          {{ title[0:14] }}...
+        {% else %}
+          {{ title }}
+        {% endif %}
+      entity_id: input_text.previous_previous_track
+  - action: input_text.set_value
+    metadata: {}
+    data:
+      value: >-
+        {% set queue_length = queue["media_player.bathroom"] | length %} {% set
+        title =
+        queue["media_player.bathroom"][(state_attr("media_player.bathroom","queue_position")
+        + queue_length - 2) % queue_length]["media_title"] %} {% if title |
+        length > 16 %}
+          {{ title[0:14] }}...
+        {% else %}
+          {{ title }}
+        {% endif %}  
+      entity_id: input_text.previous_track
+  - action: input_text.set_value
+    metadata: {}
+    data:
+      value: >-
+        {% set queue_length = queue["media_player.bathroom"] | length %} {% set
+        title =
+        queue["media_player.bathroom"][(state_attr("media_player.bathroom","queue_position")
+        + queue_length - 1) % queue_length]["media_title"] %} {% if title |
+        length > 16 %}
+          {{ title[0:14] }}...
+        {% else %}
+          {{ title }}
+        {% endif %}   
+      entity_id: input_text.current_track
+  - action: input_text.set_value
+    metadata: {}
+    data:
+      value: >-
+        {% set queue_length = queue["media_player.bathroom"] | length %} {% set
+        title =
+        queue["media_player.bathroom"][(state_attr("media_player.bathroom","queue_position")
+        + queue_length) % queue_length]["media_title"] %} {% if title | length >
+        16 %}
+          {{ title[0:14] }}...
+        {% else %}
+          {{ title }}
+        {% endif %}
+      entity_id: input_text.next_track
+  - action: input_text.set_value
+    metadata: {}
+    data:
+      value: >-
+        {% set queue_length = queue["media_player.bathroom"] | length %} {% set
+        title =
+        queue["media_player.bathroom"][(state_attr("media_player.bathroom","queue_position")
+        + queue_length + 1) % queue_length]["media_title"] %} {% if title |
+        length > 16 %}
+          {{ title[0:14] }}...
+        {% else %}
+          {{ title }}
+        {% endif %}
+      entity_id: input_text.next_next_track
+mode: single
