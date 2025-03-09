@@ -1,0 +1,219 @@
+
+esphome:
+  name: dial
+  friendly_name: Sonos Dial
+  on_boot:
+    then:
+      - pcf8563.read_time:
+      - light.turn_on: display_backlight
+  platformio_options:
+    board_build.flash_mode: dio
+
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: esp-idf
+
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "ENCRYPTION_KEY"
+
+ota:
+  - platform: esphome
+    password: "OTA_PASSWORD"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Dial Fallback Hotspot"
+    password: "HOTSPOT_PASSWORD"
+
+captive_portal:
+
+
+i2c:
+  - id: internal_i2c
+    sda: GPIO11
+    scl: GPIO12
+
+rc522_i2c:
+  - id: nfc_reader
+    i2c_id: internal_i2c
+    address: 0x28
+
+output:
+  - platform: ledc
+    pin: GPIO3
+    id: buzzer
+  - platform: ledc
+    pin: GPIO9
+    id: backlight_output
+
+rtttl:
+  output: buzzer
+
+sensor:
+  - platform: rotary_encoder
+    id: encoder
+    pin_a: GPIO40
+    pin_b: GPIO41
+    on_clockwise: 
+      then:
+        - homeassistant.action:
+            action: media_player.media_next_track
+            data:
+              entity_id: media_player.bathroom            
+    on_anticlockwise: 
+      then:
+        - homeassistant.action:
+            action: media_player.media_previous_track
+            data:
+              entity_id: media_player.bathroom  
+  - platform: homeassistant
+    id: queue_position
+    entity_id: media_player.bathroom
+    attribute: queue_position
+    accuracy_decimals: 0
+    on_value: 
+      then:
+        - component.update: round_display
+
+text_sensor:
+  - platform: homeassistant
+    id: media_player_state
+    entity_id: media_player.bathroom
+    on_value:
+      - if:
+          condition:
+            text_sensor.state: 
+              id: media_player_state
+              state: "playing"
+          then:
+            - display.page.show: playlist
+          else:
+            - display.page.show: digital_clock
+  - platform: homeassistant
+    id: prev_prev_track
+    entity_id: input_text.previous_previous_track
+  - platform: homeassistant
+    id: prev_track
+    entity_id: input_text.previous_track
+  - platform: homeassistant
+    id: current_track
+    entity_id: input_text.current_track
+  - platform: homeassistant
+    id: next_track
+    entity_id: input_text.next_track
+  - platform: homeassistant
+    id: next_next_track
+    entity_id: input_text.next_next_track
+    on_value: 
+      then:
+        - component.update: round_display
+                
+
+time:
+  # RTC
+  - platform: pcf8563
+    id: rtctime
+    i2c_id: internal_i2c
+    address: 0x51
+    update_interval: never
+  - platform: homeassistant
+    id: esptime
+    on_time_sync:
+      then:
+        - pcf8563.write_time:
+
+binary_sensor:
+  - platform: gpio
+    name: Button
+    id: front_button
+    pin: 
+      number: GPIO42
+      inverted: true
+    on_click: 
+      then:
+        - homeassistant.service: 
+            service: media_player.media_play_pause
+            data:
+              entity_id: media_player.bathroom
+
+spi:
+  id: spi_bus
+  mosi_pin: GPIO5
+  clk_pin: GPIO6
+
+font:
+  - file: "gfonts://Henny+Penny"
+    id: roboto_50
+    size: 50
+    bpp: 4
+  - file: "gfonts://Henny+Penny"
+    id: roboto_28
+    size: 28
+    bpp: 4
+  - file: "gfonts://Henny+Penny"
+    id: roboto_20
+    size: 20
+    bpp: 4
+  - file: "gfonts://Henny+Penny"
+    id: roboto_12
+    size: 12
+    bpp: 4
+
+color:
+  - id: current
+    hex: 'ce4257'
+  - id: next
+    hex: '720046'
+  - id: next_next
+    hex: '4f000b'
+
+display:
+  - platform: ili9xxx
+    id: round_display
+    model: GC9A01A
+    cs_pin: GPIO7
+    reset_pin: GPIO8
+    dc_pin: GPIO4
+    invert_colors: true
+    pages:
+      - id: playlist
+        lambda: |-
+          it.printf(it.get_width() / 2, it.get_height() / 2 - 80, id(roboto_12), id(next_next), TextAlign::CENTER, "%s", id(prev_prev_track).state.c_str());
+          it.printf(it.get_width() / 2, it.get_height() / 2 - 45, id(roboto_20), id(next), TextAlign::CENTER, "%s", id(prev_track).state.c_str());
+          it.printf(it.get_width() / 2, it.get_height() / 2, id(roboto_28), id(current), TextAlign::CENTER, "%s", id(current_track).state.c_str());
+          it.printf(it.get_width() / 2, it.get_height() / 2 + 45, id(roboto_20), id(next), TextAlign::CENTER, "%s", id(next_track).state.c_str());
+          it.printf(it.get_width() / 2, it.get_height() / 2 + 80, id(roboto_12), id(next_next), TextAlign::CENTER, "%s", id(next_next_track).state.c_str());
+      - id: digital_clock 
+        lambda: |-
+          it.strftime(it.get_width() / 2, it.get_height() / 2, id(roboto_50), id(current), TextAlign::CENTER, "%I:%M", id(rtctime).now());
+
+touchscreen:
+  - platform: ft5x06
+    id: touch
+    i2c_id: internal_i2c
+    address: 0x38
+    # interrupt_pin: GPIO14  # not supported by this component
+    on_touch:
+      then:
+        - homeassistant.service: 
+            service: media_player.media_play_pause
+            data:
+              entity_id: media_player.bathroom
+
+light:
+  - platform: monochromatic
+    name: "Backlight"
+    output: backlight_output
+    id: display_backlight 
+    default_transition_length: 0s
