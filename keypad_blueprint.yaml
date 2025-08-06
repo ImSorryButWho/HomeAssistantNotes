@@ -37,6 +37,12 @@ blueprint:
         action:
 variables:
   alarm: !input alarm
+  formatted_delay: >
+    {% set delay = state_attr(alarm, 'delay') %}
+    {% set total_seconds = delay if delay is not none else 0 %}
+    {% set minutes = total_seconds // 60 %}
+    {% set seconds = total_seconds % 60 %}
+    {{ minutes }}m{{ seconds }}s
 mode: parallel
 max: 10
 trace:
@@ -263,8 +269,8 @@ action:
             command_class: "135"
             endpoint: "0"
             property: "18"
-            property_key: "7"
-            value: "{{ state_attr(alarm, 'delay') }}"
+            property_key: "timeout"
+            value: "{{ formatted_delay }}"
     - conditions:
         - condition: trigger
           id: alarm_pending
@@ -276,8 +282,8 @@ action:
             command_class: "135"
             endpoint: "0"
             property: "17"
-            property_key: "7"
-            value: "{{ state_attr(alarm, 'delay') }}"
+            property_key: "timeout"
+            value: "{{ formatted_delay }}"
     - conditions:
         - condition: trigger
           id: alarm_triggered
