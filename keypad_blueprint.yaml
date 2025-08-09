@@ -295,7 +295,7 @@ action:
             command_class: "135"
             endpoint: "0"
             property: "13"
-            property_key: "1"
+            property_key: "9"
             value: 99
     - conditions:
       - condition: trigger
